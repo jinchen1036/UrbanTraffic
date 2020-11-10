@@ -5,7 +5,17 @@
 - [NYC Taxi Zones](https://data.cityofnewyork.us/Transportation/NYC-Taxi-Zones/d3c5-ddgc)
 
 
-#### Update requirements.txt    `pip freeze > requirements.txt`
+### Setup 
+- Clone and install packages and modules
+```
+    git clone https://github.com/jinchen1036/UrbanTraffic.git
+    cd UrbanTraffic
+    pip install -r requirements.txt
+```
+- To update requirements.txt    
+`pip freeze > requirements.txt`
+
+- See `sample.py` for get yellow taxi raw data
 
 
 # Data Format
