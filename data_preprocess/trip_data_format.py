@@ -1,6 +1,6 @@
 import vaex
 import pandas as pd
-from data.config import borough, weekday_name
+from data.config import boroughs, weekday_names
 from dataAccessor import get_taxi_data,get_zone_info
 
 year = 2020
@@ -47,16 +47,16 @@ for index, row in trip_data.iterrows():
     # Can separate time into years and months if you want
     trip = {
         'pickup_time': row['tpep_pickup_datetime'],
-        'pickup_day': weekday_name.index(row['tpep_pickup_datetime'].day_name()),
+        'pickup_day': weekday_names.index(row['tpep_pickup_datetime'].day_name()),
         'pickup_hour': row['tpep_pickup_datetime'].hour,
         'pickup_zone': row['PULocationID'],
-        'pickup_borough':borough.index(zones_info.loc[zones_info['location_id']==row['PULocationID'], 'borough'].values[0]),
+        'pickup_borough':boroughs.index(zones_info.loc[zones_info['location_id']==row['PULocationID'], 'borough'].values[0]),
 
         'dropoff_time': row['tpep_dropoff_datetime'],
-        'dropoff_day': weekday_name.index(row['tpep_dropoff_datetime'].day_name()),
+        'dropoff_day': weekday_names.index(row['tpep_dropoff_datetime'].day_name()),
         'dropoff_hour': row['tpep_dropoff_datetime'].hour,
         'dropoff_zone': row['DOLocationID'],
-        'dropoff_borough': borough.index(zones_info.loc[zones_info['location_id']==row['DOLocationID'], 'borough'].values[0]),
+        'dropoff_borough': boroughs.index(zones_info.loc[zones_info['location_id']==row['DOLocationID'], 'borough'].values[0]),
 
         'total_price': row['total_amount'],
         'payment_type': row['payment_type'],
