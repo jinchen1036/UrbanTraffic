@@ -10,4 +10,5 @@ def get_taxi_data(year, month):
     data['tpep_dropoff_datetime'] = pd.to_datetime(data['tpep_dropoff_datetime'], format='%Y-%m-%d %H:%M:%S')
     return data
 
-
+def get_zone_info():
+    return pd.read_csv("data/taxi_zone_info.csv")

@@ -6,3 +6,43 @@
 
 
 #### Update requirements.txt    `pip freeze > requirements.txt`
+
+
+# Data Format
+
+### Format of the taxi zone geo json file
+```
+{
+    'type': 'FeatureCollections', 
+    'features': [
+        {
+            'type':'Feature',
+            'geometry':
+                {
+                    'type': 'MultiPolygon',
+                    'coordinates': [
+                        [Polygon Points]
+                    ]
+                },
+            'properties':
+                {
+                    'object_id': row['OBJECTID'],
+                    'location_id':row['LocationID'],
+                    'zone': row['zone'],
+                    'borough': row['borough'],
+                    'shape_leng': row['Shape_Leng'],
+                    'shape_area': row['Shape_Area']
+                }
+        },
+        ...
+    ]
+}
+
+```
+
+### The taxi zone info csv file attributes
+- location_id
+- zone
+- borough
+- centroid_x
+- centroid_y

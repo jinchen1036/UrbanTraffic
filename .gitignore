@@ -1,3 +1,6 @@
 .idea/
 .DS_Store
 venv/
+
+dash-120million-taxi-app/
+other/
