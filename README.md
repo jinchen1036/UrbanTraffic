@@ -46,3 +46,26 @@
 - borough
 - centroid_x
 - centroid_y
+
+
+### Trip Hdf5 File
+- Hdf5 File is great for store large data (numeric values)
+- Use [vaex](https://vaex.readthedocs.io/en/latest/api.html) 
+    - lazy Out-of-Core DataFrames (similar to Pandas) 
+    - visualize and explore big tabular datasets
+- Data Fields
+    - pickup_time
+    - pickup_day        (weekday number)
+    - pickup_hour
+    - pickup_zone
+    - pickup_borough    (index of borough - please refer to data/config.py)
+    - dropoff_time
+    - dropoff_day       (weekday number)
+    - dropoff_hour
+    - dropoff_zone
+    - dropoff_borough   (index of borough - please refer to data/config.py)
+    - total_price
+    - payment_type
+    - trip_distance
+    - trip_duration_min
+    - trip_speed_mph
