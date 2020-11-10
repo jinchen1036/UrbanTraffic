@@ -50,9 +50,11 @@
 
 ### Trip Hdf5 File
 - Hdf5 File is great for store large data (numeric values)
-- Use [vaex](https://vaex.readthedocs.io/en/latest/api.html) 
+- Vaex is chose to process the data
     - lazy Out-of-Core DataFrames (similar to Pandas) 
-    - visualize and explore big tabular datasets
+    - visualize and explore big datasets
+    - To install please type this in terminal: `pip install vaex`
+    - [Vaex Documentation](https://vaex.readthedocs.io/en/latest/api.html) 
 - Data Fields
     - pickup_time
     - pickup_day        (weekday number)
