@@ -1,9 +1,9 @@
 # Urban Traffic 
 
-## Dataset 
+# Dataset 
 - [NYC Yellow Taxi Data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
 - [NYC Taxi Zones](https://data.cityofnewyork.us/Transportation/NYC-Taxi-Zones/d3c5-ddgc)
-
+- [COVID-19 NYC Cases by ZipCode](https://github.com/thecityny/covid-19-nyc-data/blob/master/zcta.csv)
 
 ### Setup 
 - Clone and install packages and modules
@@ -16,10 +16,11 @@
 `pip freeze > requirements.txt`
 
 - See `sample.py` for get yellow taxi raw data
+- See `data_preprocess/trip_data_format.py` for format taxi trip data detail
+- See `data_preprocess/zipcode_info_format.py` for zip code information 
 
 
 # Data Format
-
 ### Format of the taxi zone geo json file
 ```
 {
@@ -56,7 +57,17 @@
 - borough
 - centroid_x
 - centroid_y
+- zipcode
+- county
 
+### The zip code info csv file attributes 
+- zipcode
+- neighborhood  **(can be used to match the region in paper 4)**
+- county
+- median_household_income
+- median_home_value
+- population
+- population_density
 
 ### Trip Hdf5 File
 - Hdf5 File is great for store large data (numeric values)
