@@ -4,3 +4,5 @@ venv/
 
 dash-120million-taxi-app/
 other/
+
+*__pycache__/
