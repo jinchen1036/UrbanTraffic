@@ -81,7 +81,7 @@ for index, row in trip_data.iterrows():
 
 # save process trip data into hdf5 file
 vaex_df = vaex.from_pandas(pd.DataFrame(format_trips), copy_index=False)
-vaex_df.export_hdf5('data/yellow_taxi_%d_%02d.hdf5'%(year, month))
+vaex_df.export_hdf5('../data/yellow_taxi_%d_%02d.hdf5'%(year, month))
 
 
 # read the trip hdf5 file

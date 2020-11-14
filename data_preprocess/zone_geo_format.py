@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 
-taxi_zones = pd.read_csv("data/taxi_zones.csv")
+taxi_zones = pd.read_csv("../data/taxi_zones.csv")
 
 taxi_zone_geo_json = {'type': 'FeatureCollections', 'features': []}
 for index, row in taxi_zones.iterrows():
@@ -33,5 +33,5 @@ for index, row in taxi_zones.iterrows():
                 }}
     taxi_zone_geo_json['features'].append(zone_json)
 
-with open('data/taxi_zone_geo.json', 'w') as fp:
+with open('../data/taxi_zone_geo.json', 'w') as fp:
     json.dump(taxi_zone_geo_json, fp)

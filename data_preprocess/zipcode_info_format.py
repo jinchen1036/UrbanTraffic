@@ -30,4 +30,4 @@ for row in all_rows:
                 })
 
 zipcode_info_df = pd.DataFrame(all_zipcodes)
-zipcode_info_df.to_csv('data/zipcode_info.csv',index=False)
+zipcode_info_df.to_csv('../data/zipcode_info.csv',index=False)

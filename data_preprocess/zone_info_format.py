@@ -2,7 +2,7 @@ import pandas as pd
 from uszipcode import SearchEngine
 from data_preprocess.zone_distance import get_zone_centroid
 
-taxi_zones = pd.read_csv("data/taxi_zones.csv")
+taxi_zones = pd.read_csv("../data/taxi_zones.csv")
 search = SearchEngine(simple_zipcode=True)
 zones_info = []
 
@@ -21,5 +21,5 @@ for index, row in taxi_zones.iterrows():
     zones_info.append(zone_info)
 
 zones_info_df = pd.DataFrame(zones_info)
-zones_info_df.to_csv('data/taxi_zone_info.csv',index=False)
+zones_info_df.to_csv('../data/taxi_zone_info.csv',index=False)
 
