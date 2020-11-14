@@ -4,7 +4,7 @@
 - [NYC Yellow Taxi Data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
 - [NYC Taxi Zones](https://data.cityofnewyork.us/Transportation/NYC-Taxi-Zones/d3c5-ddgc)
 - [COVID-19 NYC Cases by ZipCode](https://github.com/thecityny/covid-19-nyc-data/blob/master/zcta.csv)
-
+    - Data from **3/31** - **5/17**
 ### Setup 
 - Clone and install packages and modules
 ```
