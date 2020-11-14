@@ -11,4 +11,4 @@ def get_taxi_data(year, month):
     return data
 
 def get_zone_info():
-    return pd.read_csv("data/taxi_zone_info.csv")
+    return pd.read_csv("../data/taxi_zone_info.csv")
