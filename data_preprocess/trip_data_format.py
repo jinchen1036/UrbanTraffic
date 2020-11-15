@@ -2,9 +2,9 @@
 import sys
 sys.path.append('/home/jchen/UrbanTraffic')
 
-
 import pandas as pd
 from datetime import timedelta
+
 from data.config import boroughs, weekday_names
 from dataAccessor import get_taxi_data,get_zone_info
 
@@ -27,10 +27,10 @@ def format_trip_data(year, month):
     trip_data.dropna(inplace = True)
 
     # TO DO: should not include the travel distance to be 0 or less
-    trip_data = trip_data[trip_data['trip_distance']>0]
+    trip_data = trip_data[trip_data['trip_distance'] > 0]
 
     # TO DO: should not include the total price to be 0 or less
-    trip_data = trip_data[trip_data['total_amount']>0]
+    trip_data = trip_data[trip_data['total_amount'] > 0]
     # TO DO:  Please see the `Format_Trip_Data_Note.md` for the payment type detail, decide if should only include Credit card and Cash payment or all
     #         After make the decision, please add a payment_type dict in data/config.py
     # - payment_type
