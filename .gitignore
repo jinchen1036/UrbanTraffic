@@ -6,3 +6,4 @@ dash-120million-taxi-app/
 other/
 
 *__pycache__/
+*trip_data/
