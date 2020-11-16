@@ -1,19 +1,17 @@
-import sys
-sys.path.append('/Users/bsl/Desktop/UrbanTraffic')
-
+import glob
 import pandas as pd
 
-yellow_taxi_2019_03 = pd.read_csv('data/yellow_taxi_2019_03_count.csv')
-yellow_taxi_2019_04 = pd.read_csv('data/yellow_taxi_2019_04_count.csv')
-yellow_taxi_2019_05 = pd.read_csv('data/yellow_taxi_2019_05_count.csv')
-yellow_taxi_2020_03 = pd.read_csv('data/yellow_taxi_2020_03_count.csv')
-yellow_taxi_2020_04 = pd.read_csv('data/yellow_taxi_2020_04_count.csv')
-yellow_taxi_2020_05 = pd.read_csv('data/yellow_taxi_2020_05_count.csv')
+yellow_taxi_files = glob.glob('data/yellow_taxi*count.csv')
+all_data = []
 
-yellow_taxi_group_data = pd.concat([yellow_taxi_2019_03,yellow_taxi_2019_04, yellow_taxi_2019_05,
-                        yellow_taxi_2020_03, yellow_taxi_2020_04, yellow_taxi_2020_05])
+for filename in yellow_taxi_files:
+    all_data.append(pd.read_csv(filename, parse_dates=['time']))
+
+yellow_taxi_group_data = pd.concat(all_data, axis=0, ignore_index=True)
 
 
-from uszipcode import SearchEngine
+# check for duplication time and zone
+clean_data = yellow_taxi_group_data.groupby(['time', 'zone']).sum()
+clean_data.reset_index(inplace=True)
 
-
+clean_data.to_csv('../data/yellow_taxi_all_count.csv',index=False)
