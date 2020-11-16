@@ -20,8 +20,8 @@ for index, row in covid_data.iterrows():
 
 covid_data_df = pd.DataFrame(format_covid)
 covid_data_df.to_csv('../data/covid_info.csv',index=False)
-
-import vaex
-vaex_df = vaex.from_pandas(covid_data_df, copy_index=False)
-vaex_df.export_hdf5('../data/covid_info.hdf5')
+#
+# import vaex
+# vaex_df = vaex.from_pandas(covid_data_df, copy_index=False)
+# vaex_df.export_hdf5('../data/covid_info.hdf5')
 
