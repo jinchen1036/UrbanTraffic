@@ -1,5 +1,5 @@
-location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,median_household_income,median_home_value,population,population_density
-1,Newark Airport,EWR,-74.174270275862,40.69024330172404,07114,Essex County,,19639.0,253200.0,14748,1980.0
+location_id,zone_name,borough,centroid_x,centroid_y,zipcode,county,neighborhood,median_household_income,median_home_value,population,population_density
+1,Newark Airport,EWR,-74.174270275862,40.69024330172404,07114,Essex County,unknow,19639.0,253200.0,14748,1980.0
 2,Jamaica Bay,Queens,-73.8298447614632,40.61112041531353,11693,Queens County,Rockaways,50570.0,323100.0,11916,11950.0
 3,Allerton/Pelham Gardens,Bronx,-73.8465098633635,40.864294038404864,10469,Bronx County,Northeast Bronx,57776.0,427100.0,66631,26903.0
 4,Alphabet City,Manhattan,-73.97520908904802,40.723853149707395,10009,New York County,Lower East Side,59929.0,672800.0,61347,99492.0
@@ -18,7 +18,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 14,Bay Ridge,Brooklyn,-74.0292460573035,40.62519597292938,11209,Kings County,Southwest Brooklyn,58261.0,625600.0,68853,31845.0
 15,Bay Terrace/Fort Totten,Queens,-73.77860618505592,40.79099485971973,11360,Queens County,North Queens,76183.0,524000.0,18884,13251.0
 22,Bensonhurst West,Brooklyn,-73.99579855752069,40.60880523078703,11204,Kings County,Borough Park,45472.0,657500.0,78134,49173.0
-23,Bloomfield/Emerson Hill,Staten Island,-74.19051212465776,40.60462435297202,10311,Richmond County,,,,0,
+23,Bloomfield/Emerson Hill,Staten Island,-74.19051212465776,40.60462435297202,10311,Richmond County,unknow,-1.0,-1.0,0,-1.0
 16,Bayside,Queens,-73.76797232853133,40.76281126316479,11361,Queens County,Northeast Queens,75335.0,574200.0,28606,16269.0
 17,Bedford,Brooklyn,-73.9503161777868,40.6923989522704,11206,Kings County,Bushwick and Williamsburg,28559.0,533400.0,81677,56939.0
 19,Bellerose,Queens,-73.72886971018568,40.73468188788073,11426,Queens County,Southeast Queens,82301.0,460500.0,17590,13039.0
@@ -43,7 +43,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 45,Chinatown,Manhattan,-73.9980492213935,40.71156838061706,10038,New York County,Lower Manhattan,66074.0,616300.0,20300,68214.0
 46,City Island,Bronx,-73.78291517371082,40.851329485061214,10464,Bronx County,Southeast Bronx,70078.0,484000.0,4534,1295.0
 42,Central Harlem North,Manhattan,-73.9370746563841,40.826384446033764,10039,New York County,Central Harlem,33595.0,352300.0,24527,52965.0
-43,Central Park,Manhattan,-73.96649770875561,40.7815070348396,10162,New York County,,168667.0,,1685,148228.0
+43,Central Park,Manhattan,-73.96649770875561,40.7815070348396,10162,New York County,unknow,168667.0,-1.0,1685,148228.0
 44,Charleston/Tottenville,Staten Island,-74.23734818312747,40.529939284356956,10309,Richmond County,South Shore,86297.0,539100.0,32519,4840.0
 47,Claremont/Bathgate,Bronx,-73.90047161694586,40.84321380141885,10457,Bronx County,Central Bronx,24949.0,397500.0,70496,66425.0
 48,Clinton East,Manhattan,-73.99074395346146,40.76139808919221,10018,New York County,Chelsea and Clinton,104635.0,1000001.0,5229,16251.0
@@ -66,7 +66,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 72,East Flatbush/Remsen Village,Brooklyn,-73.92148188772553,40.652594021955636,11203,Kings County,Flatbush,48400.0,426100.0,76174,35502.0
 66,DUMBO/Vinegar Hill,Brooklyn,-73.98768663646355,40.703132732532914,11201,Kings County,Northwest Brooklyn,95369.0,669000.0,51128,35981.0
 67,Dyker Heights,Brooklyn,-74.01504208243958,40.61743321146543,11228,Kings County,Southwest Brooklyn,61893.0,681700.0,41788,28428.0
-68,East Chelsea,Manhattan,-74.00055338001444,40.748250554159334,10199,New York County,,,,9,349.0
+68,East Chelsea,Manhattan,-74.00055338001444,40.748250554159334,10199,New York County,unknow,-1.0,-1.0,9,349.0
 73,East Flushing,Queens,-73.80716879030098,40.75294515008594,11358,Queens County,North Queens,65722.0,625200.0,37546,19260.0
 69,East Concourse/Concourse Village,Bronx,-73.91513134072308,40.83058287371743,10456,Bronx County,High Bridge and Morrisania,23452.0,388600.0,86547,84979.0
 70,East Elmhurst,Queens,-73.86587099635447,40.7632734396999,11369,Queens County,West Queens,53617.0,464500.0,38615,36170.0
@@ -98,7 +98,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 97,Fort Greene,Brooklyn,-73.97761243126776,40.69157651433026,11205,Kings County,Northwest Brooklyn,44688.0,636900.0,40366,42508.0
 98,Fresh Meadows,Queens,-73.77490131094916,40.73196585385928,11366,Queens County,Central Queens,71350.0,610100.0,13532,12362.0
 99,Freshkills Park,Staten Island,-74.20318115230641,40.56822867204138,10312,Richmond County,South Shore,85324.0,467300.0,59304,7723.0
-100,Garment District,Manhattan,-73.98871599355992,40.75338644003991,10119,New York County,,,,92,5592.0
+100,Garment District,Manhattan,-73.98871599355992,40.75338644003991,10119,New York County,unknow,-1.0,-1.0,92,5592.0
 101,Glen Oaks,Queens,-73.71560713472552,40.74649686377888,11004,Queens County,Southeast Queens,81709.0,432500.0,14016,14752.0
 102,Glendale,Queens,-73.87706507814808,40.7018023200678,11385,Queens County,West Central Queens,50799.0,495800.0,98592,27290.0
 103,Governor's Island/Ellis Island/Liberty Island,Manhattan,-74.04577206414315,40.690330527725614,10004,New York County,Lower Manhattan,129313.0,894200.0,3089,5519.0
@@ -142,9 +142,9 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 142,Lincoln Square East,Manhattan,-73.98229597835798,40.77131375940732,10019,New York County,Chelsea and Clinton,84424.0,808600.0,42870,63042.0
 152,Manhattanville,Manhattan,-73.95613224835144,40.819640190628526,10030,New York County,Central Harlem,31925.0,509000.0,26999,96790.0
 138,LaGuardia Airport,Queens,-73.87818911930803,40.778683435466085,11370,Queens County,West Queens,52500.0,517100.0,39688,27899.0
-143,Lincoln Square West,Manhattan,-73.99006535672832,40.77639415945142,10069,New York County,,170630.0,966600.0,5199,49908.0
+143,Lincoln Square West,Manhattan,-73.99006535672832,40.77639415945142,10069,New York County,unknow,170630.0,966600.0,5199,49908.0
 144,Little Italy/NoLiTa,Manhattan,-73.99667510082044,40.72097021682043,10012,New York County,Greenwich Village and Soho,86594.0,1000001.0,24090,74517.0
-145,Long Island City/Hunters Point,Queens,-73.9548810003067,40.7425155708542,11109,Queens County,,125871.0,428600.0,3523,87802.0
+145,Long Island City/Hunters Point,Queens,-73.9548810003067,40.7425155708542,11109,Queens County,unknow,125871.0,428600.0,3523,87802.0
 146,Long Island City/Queens Plaza,Queens,-73.93579074172052,40.753119915941085,11106,Queens County,Northwest Queens,48720.0,433600.0,38875,45359.0
 147,Longwood,Bronx,-73.89856557768645,40.81974319807455,10474,Bronx County,Hunts Point and Mott Haven,25676.0,351800.0,12281,8010.0
 148,Lower East Side,Manhattan,-73.99121829709992,40.71826706967135,10002,New York County,Lower East Side,33218.0,535600.0,81410,92573.0
@@ -156,13 +156,13 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 157,Maspeth,Queens,-73.90391721148781,40.72350304757724,11378,Queens County,West Queens,57474.0,538600.0,34981,13697.0
 158,Meatpacking/West Village West,Manhattan,-74.01048596077104,40.73689618882252,10014,New York County,Greenwich Village and Soho,108483.0,947300.0,31959,56119.0
 160,Middle Village,Queens,-73.88297626085782,40.71934478745253,11379,Queens County,West Central Queens,69843.0,543800.0,34821,16785.0
-161,Midtown Center,Manhattan,-73.97734956618415,40.757752716131506,10111,New York County,,,,0,
-162,Midtown East,Manhattan,-73.97262465557134,40.756517096203986,10171,New York County,,,,0,
-163,Midtown North,Manhattan,-73.9787569469772,40.76556053479537,10153,New York County,,,,0,
+161,Midtown Center,Manhattan,-73.97734956618415,40.757752716131506,10111,New York County,unknow,-1.0,-1.0,0,-1.0
+162,Midtown East,Manhattan,-73.97262465557134,40.756517096203986,10171,New York County,unknow,-1.0,-1.0,0,-1.0
+163,Midtown North,Manhattan,-73.9787569469772,40.76556053479537,10153,New York County,unknow,-1.0,-1.0,0,-1.0
 164,Midtown South,Manhattan,-73.98474777346333,40.74853196343893,10001,New York County,Chelsea and Clinton,81671.0,650200.0,21102,33959.0
 170,Murray Hill,Manhattan,-73.97830323301744,40.747472556701666,10017,New York County,Gramercy Park and Murray Hill,100652.0,637100.0,16575,51775.0
 165,Midwood,Brooklyn,-73.95822171558687,40.62171533036947,11230,Kings County,Borough Park,42170.0,598000.0,86408,46966.0
-166,Morningside Heights,Manhattan,-73.9636125203845,40.810671030378124,10115,New York County,,,,0,
+166,Morningside Heights,Manhattan,-73.9636125203845,40.810671030378124,10115,New York County,unknow,-1.0,-1.0,0,-1.0
 167,Morrisania/Melrose,Bronx,-73.90502042853323,40.82566879911504,10456,Bronx County,High Bridge and Morrisania,23452.0,388600.0,86547,84979.0
 178,Ocean Parkway South,Brooklyn,-73.97150439948601,40.61784697466657,11230,Kings County,Borough Park,42170.0,598000.0,86408,46966.0
 168,Mott Haven/Port Morris,Bronx,-73.90324577854359,40.80048800135745,10455,Bronx County,Hunts Point and Mott Haven,22609.0,318600.0,39665,55696.0
@@ -192,7 +192,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 194,Randalls Island,Manhattan,-73.92573914151377,40.79182861039341,10035,New York County,East Harlem,24533.0,445900.0,33969,24329.0
 196,Rego Park,Queens,-73.86395836116249,40.72617053246332,11374,Queens County,West Central Queens,52532.0,297300.0,43600,46664.0
 195,Red Hook,Brooklyn,-74.01303185738682,40.67444683810141,11231,Kings County,Northwest Brooklyn,78174.0,912000.0,33336,23441.0
-203,Rosedale,Queens,-73.74492430236542,40.6440908840353,11516,Nassau County,,85985.0,561700.0,7556,8650.0
+203,Rosedale,Queens,-73.74492430236542,40.6440908840353,11516,Nassau County,unknow,85985.0,561700.0,7556,8650.0
 197,Richmond Hill,Queens,-73.82909581332206,40.695485450758305,11418,Queens County,Southwest Queens,60691.0,427000.0,36256,22201.0
 198,Ridgewood,Queens,-73.9041678978622,40.70735961699393,11237,Kings County,Bushwick and Williamsburg,40372.0,464500.0,49896,50927.0
 199,Rikers Island,Bronx,-73.88068296554155,40.793489267559615,11370,Queens County,West Queens,52500.0,517100.0,39688,27899.0
@@ -225,7 +225,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 227,Sunset Park East,Brooklyn,-74.00686328972992,40.63975193057991,11220,Kings County,Sunset Park,37580.0,615300.0,99598,55603.0
 228,Sunset Park West,Brooklyn,-74.0119474835768,40.65547842971836,11220,Kings County,Sunset Park,37580.0,615300.0,99598,55603.0
 229,Sutton Place/Turtle Bay North,Manhattan,-73.96428391749836,40.75578433963389,10022,New York County,Gramercy Park and Murray Hill,109019.0,866100.0,31924,73158.0
-230,Times Sq/Theatre District,Manhattan,-73.98431328446868,40.75960675437493,10020,New York County,Chelsea and Clinton,,,0,
+230,Times Sq/Theatre District,Manhattan,-73.98431328446868,40.75960675437493,10020,New York County,Chelsea and Clinton,-1.0,-1.0,0,-1.0
 231,TriBeCa/Civic Center,Manhattan,-74.00988012165361,40.71884791267151,10013,New York County,Greenwich Village and Soho,83725.0,1000001.0,27700,50154.0
 239,Upper West Side South,Manhattan,-73.98317024389998,40.78479094272763,10023,New York County,Upper West Side,103534.0,872500.0,60998,124357.0
 232,Two Bridges/Seward Park,Manhattan,-73.98295429854691,40.713593866942,10002,New York County,Lower East Side,33218.0,535600.0,81410,92573.0
@@ -234,7 +234,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 235,University Heights/Morris Heights,Bronx,-73.91715837221277,40.85413220003511,10453,Bronx County,Central Bronx,25470.0,445200.0,78309,85491.0
 236,Upper East Side North,Manhattan,-73.95713832046145,40.78026297126913,10028,New York County,Upper East Side,104638.0,1000001.0,45141,143683.0
 237,Upper East Side South,Manhattan,-73.96566603151011,40.768456095306036,10065,New York County,Upper East Side,115519.0,1000001.0,32270,83533.0
-238,Upper West Side North,Manhattan,-73.97406636327197,40.79238761227657,10162,New York County,,168667.0,,1685,148228.0
+238,Upper West Side North,Manhattan,-73.97406636327197,40.79238761227657,10162,New York County,unknow,168667.0,-1.0,1685,148228.0
 240,Van Cortlandt Park,Bronx,-73.87908464525641,40.89079994223442,10467,Bronx County,Bronx Park and Fordham,36048.0,369500.0,97060,41649.0
 241,Van Cortlandt Village,Bronx,-73.89597174141073,40.8753425177286,10468,Bronx County,Bronx Park and Fordham,33776.0,171200.0,76103,70778.0
 258,Woodhaven,Queens,-73.8547316409158,40.68764043950458,11416,Queens County,Southwest Queens,56724.0,447200.0,24861,37347.0
@@ -244,7 +244,7 @@ location_id,zone,borough,centroid_x,centroid_y,zipcode,county,neighborhood,media
 243,Washington Heights North,Manhattan,-73.93751947033391,40.85737312681301,10034,New York County,Inwood and Washington Heights,41171.0,354700.0,38908,34544.0
 244,Washington Heights South,Manhattan,-73.94325607354216,40.84284998700479,10032,New York County,Inwood and Washington Heights,34568.0,334900.0,57331,87199.0
 253,Willets Point,Queens,-73.84220212215655,40.762045302849465,11368,Queens County,West Queens,45964.0,480900.0,109931,41768.0
-246,West Chelsea/Hudson Yards,Manhattan,-74.00811097157023,40.75010482577549,10199,New York County,,,,9,349.0
+246,West Chelsea/Hudson Yards,Manhattan,-74.00811097157023,40.75010482577549,10199,New York County,unknow,-1.0,-1.0,9,349.0
 247,West Concourse,Bronx,-73.92407632073248,40.830233394475115,10452,Bronx County,High Bridge and Morrisania,25979.0,402800.0,75371,76548.0
 248,West Farms/Bronx River,Bronx,-73.87366158191142,40.83486171692912,10460,Bronx County,Central Bronx,22307.0,391700.0,57311,43567.0
 249,West Village,Manhattan,-74.00308130090468,40.73381070285705,10011,New York County,Chelsea and Clinton,104238.0,914500.0,50984,77436.0
