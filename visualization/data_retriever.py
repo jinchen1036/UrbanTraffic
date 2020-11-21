@@ -8,7 +8,7 @@ def get_taxi_zone_geo():
     return geo_json
 
 def get_merge_data():
-    yellow_taxi_data = pd.read_csv('../data/yellow_taxi_all_count_by_dask_2020.csv', parse_dates=['time'])
+    yellow_taxi_data = pd.read_csv('../data/yellow_taxi_all_clean.csv', parse_dates=['time'])
     taxi_zone_info = pd.read_csv('../data/taxi_zone_info_all.csv')
 
     yellow_taxi_data[['zone', 'num_pickup', 'Cash', 'Card']] = yellow_taxi_data[
