@@ -7,32 +7,18 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-from visualization.data_retriever import *
 from data.config import *
+from visualization.data_holder import AppData
+from visualization.graph_functions import *
 
 
-def create_geomap(filter_df, zoom=10,center={"lat": 40.7, "lon": -73.99}):
-    fig = px.choropleth_mapbox(filter_df,
-                               geojson=geo_json,
-                               color="num_pickup",
-                               locations="zone_name",
-                               featureidkey="properties.zone",
-                               mapbox_style="carto-positron",
-                               hover_data=['zone_name','neighborhood','population','median_household_income','zipcode'],
-                               zoom=zoom,
-                               center=center,
-                               opacity=0.5,
-                               width=700, height=600
-                               )
-    return fig
 
-df_original = get_merge_data()
-geo_json = get_taxi_zone_geo()
+Data = AppData()
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div(className='app-layout', children=[
-
     # Time control panel
     html.Div(className="row", id='control-panel-1',style={'width':'100%', 'columnCount': 4},children=[
         # html.Div(className="time selection", children=[
@@ -84,14 +70,14 @@ app.layout = html.Div(className='app-layout', children=[
             html.Label('Select a day of week'),
             dcc.Dropdown(id='weekday_name',
                          placeholder='Select a day of week',
-                         options=[{'label': weekday_name, 'value': weekday_name} for weekday_name in weekday_names],
-                         value=[],
+                         options=[{'label': weekday_name, 'value': index} for index, weekday_name in enumerate(weekday_names)],
+                         value=list(range(7)),
                          multi=True),
         ])
     ]),
     html.Div(className="row", children=[
         dcc.Graph(id='map_id',
-                  figure=create_geomap(df_original.loc['2020-5-12 18:00:00']))
+                  figure=create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json))
     ])
 ])
 
