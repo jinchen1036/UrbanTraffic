@@ -45,8 +45,8 @@ def format_count(df):
     df['pickup_time'] = df['pickup_time'].dt.to_period('H')
     df['dropoff_time'] = df['dropoff_time'].dt.to_period('H')
 
-    pickup_group_data = df.groupby(['pickup_time','pickup_zone']).apply(pickup_agg, meta=(None, 'float64'))
-    dropoff_group_data = df.groupby(['dropoff_time','dropoff_zone']).apply(dropoff_agg, meta=(None, 'float64'))
+    pickup_group_data = df.groupby(['pickup_time','pickup_zone']).apply(pickup_agg)
+    dropoff_group_data = df.groupby(['dropoff_time','dropoff_zone']).apply(dropoff_agg)
     pickup_group_data.reset_index(inplace=True)
     dropoff_group_data.reset_index(inplace=True)
 
@@ -60,4 +60,4 @@ def format_count(df):
     return group_data
 
 print("Start Loading Zone Data")
-zones_info = pd.read_csv("../../data/taxi_zone_info.csv")
+zones_info = pd.read_csv("../../data/taxi_zone_info_all.csv")

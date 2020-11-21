@@ -24,13 +24,13 @@ for index, row in taxi_zones.iterrows():
     if zip_code_info:
         zone_info = {
             'location_id': row['LocationID'],
-            'zone': row['zone'],
+            'zone_name': row['zone'],
             'borough': row['borough'],
             'centroid_x': x,
             'centroid_y': y,
             'zipcode': zip_code_info.zipcode,
             'county':zip_code_info.county,
-            'neighborhood': zipcode_neighborhood[zip_code_info.zipcode] if zip_code_info.zipcode in zipcode_neighborhood  else '',
+            'neighborhood': zipcode_neighborhood[zip_code_info.zipcode] if zip_code_info.zipcode in zipcode_neighborhood  else 'unknow',
             'median_household_income': zip_code_info.median_household_income,
             'median_home_value': zip_code_info.median_home_value,
             'population': zip_code_info.population,
@@ -41,5 +41,6 @@ for index, row in taxi_zones.iterrows():
 zones_info_df = pd.DataFrame(zones_info)
 
 zones_info_df.drop_duplicates(subset ="location_id", inplace = True)
-zones_info_df.fillna("",inplace=True)
+for col in ['median_household_income','median_home_value','population_density']:
+    zones_info_df[col].fillna(-1.0,inplace=True)
 zones_info_df.to_csv('../../data/taxi_zone_info_all.csv',index=False)
