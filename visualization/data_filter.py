@@ -6,6 +6,7 @@ import pandas as pd
 def combine_zone_info(data):
     d = {}
     d['num_pickup'] = data['num_pickup'].sum()
+    d['num_dropoff'] = data['num_dropoff'].sum()
     d['ave_trip_passenger'] = (data['ave_trip_passenger']*data['num_pickup']).sum()/d['num_pickup']
     d['avg_trip_speed_mph'] = (data['avg_trip_speed_mph']*data['num_pickup']).sum()/d['num_pickup']
     d['avg_trip_distance'] = (data['avg_trip_distance']*data['num_pickup']).sum()/d['num_pickup']
