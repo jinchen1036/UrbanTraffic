@@ -23,4 +23,4 @@ data_2020 = yellow_taxi_group_data.loc['2020-03-01 00:00:00':'2020-05-31 23:59:5
 clean_data = pd.concat([data_2019,data_2020], axis=0, ignore_index=False)
 clean_data['avg_price_per_mile'] = clean_data['avg_total_price']/clean_data['avg_trip_distance']
 clean_data.reset_index(inplace=True)
-
+clean_data.to_csv('../../data/yellow_taxi_all_clean.csv',index=False)
