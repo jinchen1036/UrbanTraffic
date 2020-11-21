@@ -10,28 +10,28 @@ import plotly.graph_objects as go
 from data.config import *
 from visualization.data_holder import AppData
 from visualization.graph_functions import *
+from visualization.data_filter import *
 
 
 
 Data = AppData()
-
+total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div(className='app-layout', children=[
     # Time control panel
-    html.Div(className="row", id='control-panel-1',style={'width':'100%', 'columnCount': 4},children=[
-        # html.Div(className="time selection", children=[
-        #     dcc.Loading(
-        #         className="loader",
-        #         id="loading",
-        #         type="default",
-        #         children=[
-        #             dcc.Markdown(id='data_summary_filtered', children='Selected {:,} trips'.format(len(df_original))),
-        #             html.Progress(id="selected_progress", max=f"{len(df_original)}", value=f"{len(df_original)}"),
-        #         ]),
-        # ]),
+    html.Div(className="time selection", children=[
+        dcc.Loading(
+            className="loader",
+            id="loading",
+            type="default",
+            children=[
+                dcc.Markdown(id='data_summary_filtered', children='Selected {:,} trips'.format(total_pickup)),
+            ]),
+    ]),
 
+    html.Div(className="row", id='control-panel-1',style={'width':'100%', 'columnCount': 4},children=[
         html.Div(className="time selection", children=[
             html.Label('Select Year'),
             dcc.RangeSlider(id='year',
@@ -64,11 +64,9 @@ app.layout = html.Div(className='app-layout', children=[
 
     ]),
     html.Div(className="row", id='control-panel-2',children=[
-
-
         html.Div(className="time selection", children=[
             html.Label('Select a day of week'),
-            dcc.Dropdown(id='weekday_name',
+            dcc.Dropdown(id='weekdays',
                          placeholder='Select a day of week',
                          options=[{'label': weekday_name, 'value': index} for index, weekday_name in enumerate(weekday_names)],
                          value=list(range(7)),
@@ -76,11 +74,27 @@ app.layout = html.Div(className='app-layout', children=[
         ])
     ]),
     html.Div(className="row", children=[
-        dcc.Graph(id='map_id',
+        dcc.Graph(id='geo_map',
                   figure=create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json))
     ])
 ])
 
+
+# Map figure
+@app.callback([Output('geo_map', 'figure'),
+               Output('data_summary_filtered', 'children')],
+              [Input('year', 'value'),
+               Input('months', 'value'),
+               Input('days', 'value'),
+               Input('hours', 'value'),
+               Input('weekdays', 'value')],
+              prevent_initial_call=True)
+def update_map_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range):
+    print(year_range, month_range, days_range, hour_range,weekday_range)
+    Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
+                                              year_range, month_range, days_range, hour_range,weekday_range)
+    figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json)
+    return figure, 'Selected {:,} trips'.format(Data.taxi_trip_filter_df.num_pickup.sum())
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=5000)

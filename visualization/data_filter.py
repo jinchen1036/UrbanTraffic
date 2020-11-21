@@ -18,7 +18,12 @@ def combine_zone_info(data):
 
 
 
-def filter_by_time(trip_df,taxi_zone_df, year_range = [2019, 2020], month_range = [3, 5], days_range = [1, 31], hour_range = [0, 23],weekday_range = list(range(7))):
+def filter_by_time(trip_df,taxi_zone_df, year_range, month_range, days_range, hour_range,weekday_range):
+    if month_range[0] == 4 and days_range[0] == 31:
+        days_range[0] = 30
+    if month_range[1] == 4 and days_range[1] == 31:
+        days_range[1] = 30
+
     start_time = '%04d-%02d-%02d %02d:00:00' % (year_range[0],month_range[0], days_range[0], hour_range[0])
     end_time = '%04d-%02d-%02d %02d:00:00' % (year_range[1], month_range[1], days_range[1], hour_range[1])
 

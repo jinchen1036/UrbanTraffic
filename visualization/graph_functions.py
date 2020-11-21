@@ -11,6 +11,6 @@ def create_geomap(filter_df, geo_json, zoom=10,center={"lat": 40.7, "lon": -73.9
                                zoom=zoom,
                                center=center,
                                opacity=0.5,
-                               width=700, height=600
+                               width=1000, height=700
                                )
     return fig
