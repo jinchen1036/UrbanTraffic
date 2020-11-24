@@ -16,6 +16,9 @@ Data = DataSource()
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
+AppState.set_taxi_heatmap(create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json,AppState.scale))
+AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
+
 
 app = dash.Dash(__name__, external_stylesheets=AppState.external_stylesheets)
 app.layout = html.Div(className='app-layout', children=[
@@ -82,7 +85,7 @@ app.layout = html.Div(className='app-layout', children=[
             ),
             html.Div(className="row", children=[
                 dcc.Graph(id='geo_map',
-                          figure=create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json,AppState.scale))
+                          figure=AppState.taxi_heatmap)
             ])
         ]),
         dcc.Tab(label='Compare Traffic Attributes', children=[
@@ -104,7 +107,7 @@ app.layout = html.Div(className='app-layout', children=[
             ]),
             html.Div(className="row", children=[
                 dcc.Graph(id='scatter_plot',
-                          figure=create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
+                          figure=AppState.taxi_scatter)
             ])
         ])
     ])
@@ -127,8 +130,12 @@ app.layout = html.Div(className='app-layout', children=[
 def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scale_type,scatter_x,scatter_y):
     print(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
 
+    geo_figure = AppState.taxi_heatmap
+    scatter_figure = AppState.taxi_scatter
+
     if not weekday_range:
         weekday_range = list(range(7))
+
     # check time  change
     time_dict = {
         'year_range': year_range,
@@ -138,13 +145,9 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
         'weekday_range': weekday_range
     }
     time_change = AppState.check_attribute_change(time_dict)
-    if time_change:
-        Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
-                                                  year_range, month_range, days_range, hour_range,weekday_range)
-        AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
-    AppState.scale = scale_type
 
-    geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json,AppState.scale)
+    #check scale change
+    scale_change = AppState.check_attribute_change({"scale":scale_type})
 
     # check scatter attribute
     scatter_dict = {
@@ -152,7 +155,21 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
         'scatter_y':scatter_y
     }
     scatter_change = AppState.check_attribute_change(scatter_dict)
-    scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
+
+
+    if time_change:
+        Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
+                                                  year_range, month_range, days_range, hour_range,weekday_range)
+        AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
+
+
+    if time_change or scale_change:
+        geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json, AppState.scale)
+
+    if time_change or scatter_change:
+        scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
+
+
     return geo_figure,scatter_figure, '## Selected %d trips' % (AppState.total_pickup)
 
 
