@@ -8,7 +8,7 @@ def generate_yellow_url(years, months):
     return dates
 
 def get_trip_duration(trip):
-    return (trip['dropoff_time']  - trip['pickup_time']).total_seconds()/60
+    return (trip['dropoff_time'] - trip['pickup_time']).total_seconds()/60
 
 def pickup_agg(x):
     d = {}

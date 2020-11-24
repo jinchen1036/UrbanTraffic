@@ -12,7 +12,7 @@ def combine_zone_info(data):
     d['avg_trip_distance'] = (data['avg_trip_distance']*data['num_pickup']).sum()/d['num_pickup']
     d['avg_total_price'] = (data['avg_total_price']*data['num_pickup']).sum()/d['num_pickup']
     d['avg_price_per_mile'] = (data['avg_price_per_mile']*data['num_pickup']).sum()/d['num_pickup']
-    d['avg_price_per_mile'] = (data['avg_price_per_mile'] * data['num_pickup']).sum() / d['num_pickup']
+    # d['avg_price_per_mile'] = (data['avg_price_per_mile'] * data['num_pickup']).sum() / d['num_pickup']
     d['Cash'] = data['Cash'].sum()
     d['Card'] = data['Card'].sum()
     return pd.Series(d)#, index=['num_pickup', 'avg_trip_speed_mph', 'avg_trip_distance', 'avg_total_price'])

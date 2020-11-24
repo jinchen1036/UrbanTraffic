@@ -20,10 +20,6 @@ available_indicators = df.columns.values
 
 df = AppData().taxi_trip_df
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
 available_indicators = df.columns.values
 
 app.layout = html.Div([
