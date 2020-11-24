@@ -136,26 +136,7 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
     if not weekday_range:
         weekday_range = list(range(7))
 
-    # check time  change
-    time_dict = {
-        'year_range': year_range,
-        'month_range': month_range,
-        'days_range': days_range,
-        'hour_range': hour_range,
-        'weekday_range': weekday_range
-    }
-    time_change = AppState.check_attribute_change(time_dict)
-
-    #check scale change
-    scale_change = AppState.check_attribute_change({"scale":scale_type})
-
-    # check scatter attribute
-    scatter_dict = {
-        'scatter_x':scatter_x,
-        'scatter_y':scatter_y
-    }
-    scatter_change = AppState.check_attribute_change(scatter_dict)
-
+    time_change, scale_change, scatter_change = AppState.check_time_scale_scatter_change(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
 
     if time_change:
         Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
@@ -168,7 +149,6 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
 
     if time_change or scatter_change:
         scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
-
 
     return geo_figure,scatter_figure, '## Selected %d trips' % (AppState.total_pickup)
 

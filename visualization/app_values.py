@@ -44,3 +44,26 @@ class AppData:
                 change = True
         return change
 
+
+    def check_time_scale_scatter_change(self,year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y):
+        # check time  change
+        time_dict = {
+            'year_range': year_range,
+            'month_range': month_range,
+            'days_range': days_range,
+            'hour_range': hour_range,
+            'weekday_range': weekday_range
+        }
+        time_change = self.check_attribute_change(time_dict)
+
+        # check scale change
+        scale_change = self.check_attribute_change({"scale": scale_type})
+
+        # check scatter attribute
+        scatter_dict = {
+            'scatter_x': scatter_x,
+            'scatter_y': scatter_y
+        }
+        scatter_change = self.check_attribute_change(scatter_dict)
+
+        return time_change, scale_change, scatter_change
