@@ -17,7 +17,9 @@ def combine_zone_info(data):
     d['Card'] = data['Card'].sum()
     return pd.Series(d)#, index=['num_pickup', 'avg_trip_speed_mph', 'avg_trip_distance', 'avg_total_price'])
 
-
+def combine_zipcode_info(data):
+    d = {}
+    d['total_case'] = data['daily_case'].sum()
 
 def filter_by_time(trip_df,taxi_zone_df, year_range, month_range, days_range, hour_range,weekday_range):
     if month_range[0] == 4 and days_range[0] == 31:
@@ -42,6 +44,23 @@ def filter_by_time(trip_df,taxi_zone_df, year_range, month_range, days_range, ho
                         right_on='zone')  # how='left' remove missing zones
 
     return merge_df
+
+
+def filter_zipcode_by_time(covid_df,  start_day, end_day):
+
+    # filter by time
+    # month_cond = (month_range[0] <= covid_df['month']) & (covid_df['month'] <= month_range[1])
+    # day_cond = (days_range[0] <= covid_df['day']) & (covid_df['day'] <= days_range[1])
+
+    start_df = covid_df.loc[start_day]
+    end_df = covid_df.loc[end_day, ['zipcode', 'num_cases', 'num_test']]
+
+    final_df = pd.merge(start_df, end_df, how='inner', on=['zipcode'])
+    final_df['num_cases'] = final_df['num_cases_y'] - final_df['num_cases_x']
+    final_df['num_tests'] = final_df['num_test_y'] - final_df['num_test_x']
+
+    final_df.drop(['num_cases_y', 'num_cases_x','num_test_y','num_test_x'], axis=1, inplace=True)
+    return final_df
 #
 #
 # year_range = [2020, 2020]

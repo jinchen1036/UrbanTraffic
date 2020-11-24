@@ -40,3 +40,23 @@ def create_scatter_plot(filter_df, attribute_x,attribute_y):
     # fig.update_yaxes(title=attribute_y)
 
     return fig
+
+def create_zipcode_geomap(filter_df, geo_json, zoom=9.5,center={"lat": 40.7, "lon": -73.99}):
+    fig = px.choropleth_mapbox(filter_df,
+                               geojson=geo_json,
+                               # color="num_pickup",
+                               color="num_cases",
+                               # showscale = False,
+                               locations="zipcode",
+                               featureidkey="properties.postalCode",
+                               mapbox_style="carto-positron",
+                               hover_data=['neighborhood','population','median_household_income','zipcode'],
+                               zoom=zoom,
+                               center=center,
+                               opacity=0.5,
+                               color_continuous_scale = px.colors.sequential.Reds,
+                               width=1300, height=600
+                               )
+    fig.update_traces(colorbar=None)
+    fig.update_traces(showscale=False)
+    return fig
