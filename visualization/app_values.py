@@ -3,7 +3,7 @@ class AppData:
         self.external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
         self.scatter_x = 'avg_trip_distance'
         self.scatter_y = 'avg_total_price'
-
+        self.scale = 'Linear'
         self.attributes = column_names
         self.total_pickup = total_pickup
         self.total_dropoff = total_dropoff
@@ -13,6 +13,8 @@ class AppData:
         self.days_range =[1, 31]
         self.hour_range =[0, 23]
         self.weekday_range = list(range(7))
+
+
 
     def get_attribute_list_dict(self):
         return [{'label': i, 'value': i} for i in self.attributes]

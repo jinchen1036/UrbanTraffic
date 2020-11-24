@@ -1,11 +1,16 @@
 import numpy as np
 import plotly.express as px
 
-def create_geomap(filter_df, geo_json, zoom=10,center={"lat": 40.7, "lon": -73.99}):
+def create_geomap(filter_df, geo_json, scale, zoom=9.5,center={"lat": 40.7, "lon": -73.99}):
+
+    if scale == "Linear":
+        color = filter_df["num_pickup"]
+    else:
+        color = np.log10(filter_df["num_pickup"])
     fig = px.choropleth_mapbox(filter_df,
                                geojson=geo_json,
                                # color="num_pickup",
-                               color=np.log10(filter_df["num_pickup"]),
+                               color=color,
                                # showscale = False,
                                locations="zone_name",
                                featureidkey="properties.zone",
@@ -17,7 +22,7 @@ def create_geomap(filter_df, geo_json, zoom=10,center={"lat": 40.7, "lon": -73.9
                                center=center,
                                opacity=0.5,
                                color_continuous_scale = px.colors.sequential.Reds,
-                               width=1000, height=700
+                               width=1300, height=600
                                )
 
     fig.update_traces(colorbar=None)

@@ -20,16 +20,15 @@ AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
 app = dash.Dash(__name__, external_stylesheets=AppState.external_stylesheets)
 app.layout = html.Div(className='app-layout', children=[
     # Time control panel
-    html.Div(className="time selection", children=[
+    html.Div(id='display-panel', children=[
         dcc.Loading(
             className="loader",
             id="loading",
             type="default",
             children=[
-                dcc.Markdown(id='data_summary_filtered', children='Selected {:,} trips'.format(AppState.total_pickup)),
+                dcc.Markdown(id='data_summary_filtered', children='## Selected %d trips' % (AppState.total_pickup)),
             ]),
     ]),
-
     html.Div(className="row", id='control-panel-1',style={'width':'100%', 'columnCount': 4},children=[
         html.Div(className="time selection", children=[
             html.Label('Select Year'),
@@ -70,30 +69,45 @@ app.layout = html.Div(className='app-layout', children=[
                          multi=True),
         ])
     ]),
-    html.Div(className="row", children=[
-        dcc.Graph(id='geo_map',
-                  figure=create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json))
-    ]),
-    html.Div(className="row", children=[
-        html.Div([
-            dcc.Dropdown(
-                id='scatter_x',
-                options=AppState.get_attribute_list_dict(),
-                value=AppState.scatter_x
-            )
-        ],style={'width': '48%', 'display': 'inline-block'}),
-        html.Div([
-            dcc.Dropdown(
-                id='scatter_y',
-                options= AppState.get_attribute_list_dict(),
-                value=AppState.scatter_y
-            )
-        ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
-    ]),
-    html.Div(className="row", children=[
-        dcc.Graph(id='scatter_plot',
-                  figure=create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
-    ]),
+    dcc.Tabs(id='tab', children=[
+        dcc.Tab(label='New York City Traffic Geomap', children=[
+            html.Div(style={'width': '20%', 'columnCount': 2}, children=[
+                html.Label('Map Scale: '),
+                dcc.RadioItems(
+                    id='scale_type',
+                    options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                    value=AppState.scale,
+                    labelStyle={'width': '50%', 'display': 'inline-block'}
+                )]
+            ),
+            html.Div(className="row", children=[
+                dcc.Graph(id='geo_map',
+                          figure=create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json,AppState.scale))
+            ])
+        ]),
+        dcc.Tab(label='Compare Traffic Attributes', children=[
+            html.Div(className="row", children=[
+                html.Div([
+                    dcc.Dropdown(
+                        id='scatter_x',
+                        options=AppState.get_attribute_list_dict(),
+                        value=AppState.scatter_x
+                    )
+                ],style={'width': '48%', 'display': 'inline-block'}),
+                html.Div([
+                    dcc.Dropdown(
+                        id='scatter_y',
+                        options= AppState.get_attribute_list_dict(),
+                        value=AppState.scatter_y
+                    )
+                ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
+            ]),
+            html.Div(className="row", children=[
+                dcc.Graph(id='scatter_plot',
+                          figure=create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
+            ])
+        ])
+    ])
 ])
 
 
@@ -106,13 +120,15 @@ app.layout = html.Div(className='app-layout', children=[
                Input('days', 'value'),
                Input('hours', 'value'),
                Input('weekdays', 'value'),
+               Input('scale_type', 'value'),
                Input('scatter_x', 'value'),
-               Input('scatter_y', 'value'),
-               Input('geo_map', 'figure'),],
+               Input('scatter_y', 'value')],
               prevent_initial_call=True)
-def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scatter_x,scatter_y, geo_figure):
-    print(year_range, month_range, days_range, hour_range,weekday_range,scatter_x,scatter_y)
+def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scale_type,scatter_x,scatter_y):
+    print(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
 
+    if not weekday_range:
+        weekday_range = list(range(7))
     # check time  change
     time_dict = {
         'year_range': year_range,
@@ -125,7 +141,11 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
     if time_change:
         Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
                                                   year_range, month_range, days_range, hour_range,weekday_range)
-        geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json)
+        AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
+    AppState.scale = scale_type
+
+    geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json,AppState.scale)
+
     # check scatter attribute
     scatter_dict = {
         'scatter_x':scatter_x,
@@ -133,7 +153,7 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
     }
     scatter_change = AppState.check_attribute_change(scatter_dict)
     scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
-    return geo_figure,scatter_figure, 'Selected {:,} trips'.format(Data.taxi_trip_filter_df.num_pickup.sum())
+    return geo_figure,scatter_figure, '## Selected %d trips' % (AppState.total_pickup)
 
 
 # # Update scatter by change attribute
