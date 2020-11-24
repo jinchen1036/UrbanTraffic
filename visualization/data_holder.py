@@ -1,9 +1,8 @@
 import json
-import numpy as np
 import pandas as pd
 from visualization.data_filter import filter_by_time
 
-class AppData:
+class DataSource:
     def __init__(self):
         self.taxi_geo_json = self.get_taxi_zone_geo()
         self.taxi_zone_df = self.get_taxi_zone()
