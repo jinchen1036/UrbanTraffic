@@ -28,9 +28,9 @@ class AppData:
     def set_taxi_scatter(self, taxi_scatter):
         self.taxi_scatter = taxi_scatter
 
-    def set_covid_heatmap(self, covid_heatmap):
+    def set_covid_heatmap(self, covid_heatmap, zipcode_trip_heatmap):
         self.covid_heatmap = covid_heatmap
-
+        self.zipcode_trip_heatmap = zipcode_trip_heatmap
 
     def check_attribute_change(self,value_list):
         '''

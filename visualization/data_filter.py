@@ -46,24 +46,25 @@ def filter_by_time(trip_df,taxi_zone_df, agg_column, year_range, month_range, da
     return merge_df
 
 
-def filter_zipcode_by_time(covid_df,  start_day, end_day):
+def filter_zipcode_by_time(covid_df,zipcode_trip,agg_column, start_day, end_day):
 
     # filter by time
-    # month_cond = (month_range[0] <= covid_df['month']) & (covid_df['month'] <= month_range[1])
-    # day_cond = (days_range[0] <= covid_df['day']) & (covid_df['day'] <= days_range[1])
-
     start_df = covid_df.loc[start_day]
     if end_day == start_day:
         return start_day.rename(columns={"num_test": "num_tests"}, errors="raise")
 
     end_df = covid_df.loc[end_day, ['zipcode', 'num_cases', 'num_test']]
-# df["Time"].dt.normalize().unique()
     final_df = pd.merge(start_df, end_df, how='inner', on=['zipcode'])
     final_df['num_cases'] = final_df['num_cases_y'] - final_df['num_cases_x']
     final_df['num_tests'] = final_df['num_test_y'] - final_df['num_test_x']
-
     final_df.drop(['num_cases_y', 'num_cases_x','num_test_y','num_test_x'], axis=1, inplace=True)
-    return final_df
+
+    # process  zipcode file
+    zipcode_trip = zipcode_trip.loc[start_day:end_day]
+    zipcode_trip_group = combine_zone_info(data=zipcode_trip.reset_index(), agg_column=agg_column,
+                                          group_by_criteria='zipcode')
+
+    return final_df, zipcode_trip_group
 #
 #
 # year_range = [2019, 2020]

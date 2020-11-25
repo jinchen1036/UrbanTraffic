@@ -41,22 +41,30 @@ def create_scatter_plot(filter_df, attribute_x,attribute_y):
 
     return fig
 
-def create_zipcode_geomap(filter_df, geo_json, zoom=9.5,center={"lat": 40.7, "lon": -73.99}):
-    fig = px.choropleth_mapbox(filter_df,
+def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, zoom=8.5,center={"lat": 40.7, "lon": -73.99}):
+    covid_fig = px.choropleth_mapbox(covid_df,
+                                     geojson=geo_json,
+                                     color="num_cases",
+                                     locations="zipcode",
+                                     featureidkey="properties.postalCode",
+                                     mapbox_style="carto-positron",
+                                     hover_data=['neighborhood','population','median_household_income','zipcode','num_tests'],
+                                     zoom=zoom,center=center,opacity=0.5,
+                                     color_continuous_scale = px.colors.sequential.Reds,
+                                     title="COVID-19 Data"# width=1300, height=600
+                                     )
+    zipcode_trip_fig = px.choropleth_mapbox(zipcode_trip_df,
                                geojson=geo_json,
-                               # color="num_pickup",
-                               color="num_cases",
-                               # showscale = False,
+                               color="num_pickup",
                                locations="zipcode",
                                featureidkey="properties.postalCode",
                                mapbox_style="carto-positron",
-                               hover_data=['neighborhood','population','median_household_income','zipcode','num_tests'],
-                               zoom=zoom,
-                               center=center,
-                               opacity=0.5,
+                               hover_data=['num_cash_payment', 'num_card_payment','num_dropoff', 'avg_trip_passenger',
+                                           'avg_trip_speed_mph','avg_trip_distance', 'avg_total_price',
+                                           'avg_price_per_mile'],
+                               zoom=zoom,center=center,opacity=0.5,
                                color_continuous_scale = px.colors.sequential.Reds,
-                               width=1300, height=600
+                               title="NYC Yellow Taxi Data"
+                               # width=1300, height=600
                                )
-    fig.update_traces(colorbar=None)
-    fig.update_traces(showscale=False)
-    return fig
+    return covid_fig, zipcode_trip_fig

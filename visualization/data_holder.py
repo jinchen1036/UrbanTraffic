@@ -78,7 +78,7 @@ class DataSource:
 
         group_df = combine_zone_info(data=data, agg_column=self.agg_column,
                                      group_by_criteria=['time','zipcode'])
-
+        group_df.set_index('time', inplace=True)
         return group_df.drop(columns=['zone'])
 
 # import json
