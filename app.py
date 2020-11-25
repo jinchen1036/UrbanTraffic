@@ -162,6 +162,9 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
     if time_change:
         Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,Data.agg_column,
                                                   year_range, month_range, days_range, hour_range,weekday_range)
+        if Data.taxi_trip_filter_df.empty:
+            AppState.total_pickup = 0
+            return AppState.taxi_heatmap,AppState.taxi_scatter, '## No trip data available for this time period, please reselect the time range'
         AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
 
     if time_change or scale_change:

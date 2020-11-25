@@ -16,19 +16,25 @@ def combine_zone_info(data, agg_column, group_by_criteria):
 
 
 def filter_by_time(trip_df,taxi_zone_df, agg_column, year_range, month_range, days_range, hour_range,weekday_range):
-    if month_range[0] == 4 and days_range[0] == 31:
-        days_range[0] = 30
-    if month_range[1] == 4 and days_range[1] == 31:
-        days_range[1] = 30
 
-    start_day = '%04d-%02d-%02d' % (year_range[0],month_range[0], days_range[0])
-    end_day = '%04d-%02d-%02d' % (year_range[1], month_range[1], days_range[1])
 
+    # start_day = '%04d-%02d-%02d' % (year_range[0],month_range[0], days_range[0])
+    # end_day = '%04d-%02d-%02d' % (year_range[1], month_range[1], days_range[1])
+    #
     start_time = '%02d:00:00' % hour_range[0]
     end_time = '%02d:00:00'% hour_range[1]
 
+    select_time = pd.DatetimeIndex([])
+    for year in range(year_range[0], year_range[-1] + 1):
+        for month in range(month_range[0], month_range[-1] + 1):
+            if month == 4:
+                days_range[0] = 30 if days_range[0] == 31 else days_range[0]
+                days_range[1] = 30 if days_range[1] == 31 else days_range[1]
+            select_time = select_time.union(pd.date_range(start='%d/%d/%d' % (month, days_range[0], year),
+                                                          end='%d/%d/%d' % (month, days_range[-1], year)))
+
     # filter by time
-    df = trip_df.loc[start_day:end_day].between_time(start_time, end_time)
+    df = trip_df.loc[select_time].between_time(start_time, end_time)
     df = df[np.isin(np.array(df.index.weekday,dtype=np.int), weekday_range)]
 
     # group by zone
@@ -60,9 +66,17 @@ def filter_zipcode_by_time(covid_df,  start_day, end_day):
     return final_df
 #
 #
-# year_range = [2020, 2020]
-# month_range = [3, 3]
-# days_range = [1, 4]
+# year_range = [2019, 2020]
+# month_range = [3, 4]
+# days_range = [17, 30]
 # hour_range = [0, 23]
 # weekday_range = list(range(7))
-
+#
+#
+# select_time = pd.DatetimeIndex([])
+# for year in range(year_range[0],year_range[-1]+1):
+#     for month in range(month_range[0], month_range[-1] + 1):
+#         print(year,month)
+#         select_time = select_time.union(pd.date_range(start='%d/%d/%d'%(month,days_range[0],year),
+#                                              end='%d/%d/%d'%(month,days_range[-1],year)))
+#
