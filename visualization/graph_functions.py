@@ -41,7 +41,7 @@ def create_scatter_plot(filter_df, attribute_x,attribute_y):
 
     return fig
 
-def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcode_attr, zoom=8.5,center={"lat": 40.7, "lon": -73.99}):
+def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcode_attr, zoom=9,center={"lat": 40.7, "lon": -73.99}):
     covid_fig = px.choropleth_mapbox(covid_df,
                                      geojson=geo_json,
                                      color=covid_attr,
@@ -51,7 +51,8 @@ def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcod
                                      hover_data=['neighborhood','population','median_household_income','zipcode','num_tests'],
                                      zoom=zoom,center=center,opacity=0.5,
                                      color_continuous_scale = px.colors.sequential.Reds,
-                                     title="COVID-19 Data"# width=1300, height=600
+                                     title="COVID-19 Data",
+                                     width=730, height=600
                                      )
     zipcode_trip_fig = px.choropleth_mapbox(zipcode_trip_df,
                                geojson=geo_json,
@@ -64,7 +65,7 @@ def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcod
                                            'avg_price_per_mile'],
                                zoom=zoom,center=center,opacity=0.5,
                                color_continuous_scale = px.colors.sequential.Reds,
-                               title="NYC Yellow Taxi Data"
-                               # width=1300, height=600
+                               title="NYC Yellow Taxi Data",
+                               width=730, height=600
                                )
     return covid_fig, zipcode_trip_fig

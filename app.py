@@ -11,7 +11,7 @@ from visualization.graph_functions import *
 from visualization.data_filter import *
 
 
-Data = DataSource()
+Data = DataSource("data")
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
@@ -136,7 +136,7 @@ app.layout = html.Div(className='app-layout', children=[
                     ]),
                     html.Div(id='date-picker-warning'),
                 ]),
-                html.Div(style={'columnCount': 2}, children=[
+                html.Div(style={'width':'100%','columnCount': 2}, children=[
                     html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap) ]),
                     html.Div(className="row", children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap) ])
                 ]),
@@ -145,13 +145,13 @@ app.layout = html.Div(className='app-layout', children=[
                         id='covid_attribute_dropdown',multi=False,
                         options=AppState.get_attribute_list_dict(AppState.covid_attribute),
                         value=AppState.covid_attribute_dropdown,
-                        style={'width': '50%'}
+                        style={'width': '50%','padding-left':'20%'}
                     ),
                     dcc.Dropdown(
                         id='zipcode_trip_attribute_dropdown',multi=False,
                         options=AppState.get_attribute_list_dict(AppState.zipcode_trip_attribute),
                         value=AppState.zipcode_trip_attribute_dropdown,
-                        style={'width': '50%'}
+                        style={'width': '50%','padding-left':'10%'}
                     )
                 ])
             ])
