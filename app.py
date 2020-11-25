@@ -12,7 +12,7 @@ from visualization.graph_functions import *
 from visualization.data_filter import *
 
 
-Data = DataSource("data")
+Data = DataSource("../data")
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
@@ -160,7 +160,7 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
 
     time_change, scale_change, scatter_change = AppState.check_time_scale_scatter_change(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
     if time_change:
-        Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
+        Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,Data.agg_column,
                                                   year_range, month_range, days_range, hour_range,weekday_range)
         AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
 

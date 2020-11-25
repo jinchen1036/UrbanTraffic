@@ -25,10 +25,9 @@
     - [plotly](https://plotly.com/python/plotly-fundamentals/) is use as the main visualization package
     
 # Deployment
-[Live Link](https://urban-traffic-visualization.herokuapp.com/)
-```.env
-    git push heroku main 
-```
+- [Live Link](https://urban-traffic-visualization.herokuapp.com/)
+- [Documentation](https://dash.plotly.com/deployment)
+
 
  
 # Data Format

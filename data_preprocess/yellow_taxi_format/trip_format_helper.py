@@ -13,18 +13,18 @@ def get_trip_duration(trip):
 def pickup_agg(x):
     d = {}
     d['num_pickup'] = x['passenger_count'].count()
-    d['ave_trip_passenger'] = x['passenger_count'].sum()/d['num_pickup']
+    d['avg_trip_passenger'] = x['passenger_count'].sum()/d['num_pickup']
     d['avg_trip_speed_mph'] = x['trip_speed_mph'].mean()
     d['avg_trip_distance'] = x['trip_distance'].mean()
     d['avg_total_price'] = x['total_price'].mean()
 
-    d['Cash'] = 0
-    d['Card'] = 0
+    d['num_cash_payment'] = 0
+    d['num_card_payment'] = 0
     payment_type = x['payment_type'].value_counts().to_dict()
     if 2.0 in payment_type:
-        d['Cash'] = payment_type[2.0]
+        d['num_cash_payment'] = payment_type[2.0]
     if 1.0 in payment_type:
-        d['Card'] = payment_type[1.0]
+        d['num_card_payment'] = payment_type[1.0]
     return pd.Series(d)#, index=['num_pickup', 'avg_trip_speed_mph', 'avg_trip_distance', 'avg_total_price'])
 
 def dropoff_agg(x):

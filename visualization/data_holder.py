@@ -1,20 +1,27 @@
 import json
 import pandas as pd
-from visualization.data_filter import filter_by_time
+from visualization.data_filter import filter_by_time, combine_zone_info
 
 class DataSource:
     def __init__(self, path_dir = '../data'):
         self.path_dir = path_dir
-        self.taxi_geo_json = self.get_taxi_zone_geo()
-        self.taxi_zone_df = self.get_taxi_zone()
+        self.agg_column = ['trip_passenger', 'trip_speed_mph', 'trip_distance', 'total_price', 'price_per_mile']
+
         self.covid_19 = self.get_covid_19()
         self.covid_available_days = pd.Series(self.covid_19.index).dt.normalize().unique()
 
         self.zipcode_geo_json = self.get_zip_code_geo()
+        self.taxi_geo_json = self.get_taxi_zone_geo()
+
+        self.taxi_zone_df = self.get_taxi_zone()
         self.taxi_trip_df = self.get_yellow_taxi_data()
-        self.taxi_trip_filter_df = filter_by_time(self.taxi_trip_df,self.taxi_zone_df, year_range = [2019, 2020],
+        self.zipcode_trip_df = self.get_yellow_taxi_by_zone()
+
+        self.taxi_trip_filter_df = filter_by_time(self.taxi_trip_df,self.taxi_zone_df, self.agg_column,
+                                                  year_range = [2019, 2020],
                                                   month_range = [3, 5], days_range = [1, 31],
                                                   hour_range = [0, 23],weekday_range = list(range(7)))
+
 
     def get_taxi_zone_geo(self):
         with open('%s/NYC Taxi Zones.geojson'%self.path_dir) as f:
@@ -42,8 +49,8 @@ class DataSource:
 
     def get_yellow_taxi_data(self):
         yellow_taxi_data = pd.read_csv('%s/yellow_taxi_all_clean.csv'%self.path_dir, parse_dates=['time'])
-        yellow_taxi_data[['zone', 'num_pickup', 'num_dropoff', 'Cash', 'Card']] = yellow_taxi_data[
-            ['zone', 'num_pickup', 'num_dropoff', 'Cash', 'Card']].astype('int32')
+        yellow_taxi_data[['zone', 'num_pickup', 'num_dropoff', 'num_cash_payment', 'num_card_payment']] = yellow_taxi_data[
+            ['zone', 'num_pickup', 'num_dropoff', 'num_cash_payment', 'num_card_payment']].astype('int32')
 
         # merge_df = pd.merge(yellow_taxi_data, self.taxi_zone_df, left_on='zone',
         #                     right_on='location_id')  # how='left' remove missing value - zone 264, 265
@@ -58,7 +65,24 @@ class DataSource:
         return yellow_taxi_data
 
     def get_yellow_taxi_by_zone(self):
-        df = self.taxi_trip_df.reset_index()
-        df2 = pd.merge(df, self.taxi_zone_df, left_on='zone',
-                        right_on='zone')
-        df3 = df2.groupby(['time','zipcode']).apply(combine_zone_info)
+        data = pd.merge(self.taxi_trip_df.reset_index(), self.taxi_zone_df[['zipcode','zone']],
+                       left_on='zone',right_on='zone')
+        # for name in self.agg_column:
+        #     data['sum_%s'%name] = data['avg_%s'%name] * data['num_pickup']
+        #     data.drop(columns=['avg_%s'%name], inplace=True)
+        # group_df = data.groupby(['time','zipcode']).agg('sum').reset_index()
+        #
+        # for name in self.agg_column:
+        #     group_df['avg_%s' % name] = group_df['sum_%s'%name] / group_df['num_pickup']
+        #     group_df.drop(columns=['sum_%s'%name], inplace=True)
+
+        group_df = combine_zone_info(data=data, agg_column=self.agg_column,
+                                     group_by_criteria=['time','zipcode'])
+
+        return group_df.drop(columns=['zone'])
+
+# import json
+# import pandas as pd
+# from visualization.data_filter import filter_by_time, combine_zone_info
+# from visualization.data_holder import DataSource
+# self = DataSource('data')
