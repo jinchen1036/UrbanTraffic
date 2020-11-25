@@ -24,6 +24,7 @@ AppState.set_covid_heatmap(create_zipcode_geomap(filter_zipcode_by_time(Data.cov
                                                  Data.zipcode_geo_json))
 
 app = dash.Dash(__name__, external_stylesheets=AppState.external_stylesheets)
+server = app.server
 app.layout = html.Div(className='app-layout', children=[
     dcc.Tabs(id='main-tab', children=[
         dcc.Tab(label='New York City Traffic', children=[
@@ -223,4 +224,4 @@ def update_output(start_date, end_date):
 #     return scatter_figure
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=5000)
+    app.run_server(debug=True)
