@@ -1,3 +1,4 @@
+from datetime import date
 class AppData:
     def __init__(self, column_names, total_pickup,total_dropoff):
         self.external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -14,6 +15,10 @@ class AppData:
         self.hour_range =[0, 23]
         self.weekday_range = list(range(7))
 
+        #
+        self.covid_start_date = date(2020, 3, 31)
+        self.covid_end_date = date(2020, 5, 17)
+
     def get_attribute_list_dict(self):
         return [{'label': i, 'value': i} for i in self.attributes]
 
@@ -22,6 +27,9 @@ class AppData:
 
     def set_taxi_scatter(self, taxi_scatter):
         self.taxi_scatter = taxi_scatter
+
+    def set_covid_heatmap(self, covid_heatmap):
+        self.covid_heatmap = covid_heatmap
 
 
     def check_attribute_change(self,value_list):

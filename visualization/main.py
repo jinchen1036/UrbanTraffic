@@ -2,7 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-
+from datetime import date
 
 from data.config import *
 from visualization.data_holder import DataSource
@@ -18,96 +18,119 @@ AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
 AppState.set_taxi_heatmap(create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json,AppState.scale))
 AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
-
+AppState.set_covid_heatmap(create_zipcode_geomap(filter_zipcode_by_time(Data.covid_19,
+                                                                        start_day=AppState.covid_start_date.strftime('%Y-%m-%d'),
+                                                                        end_day =AppState.covid_end_date.strftime('%Y-%m-%d') ),
+                                                 Data.zipcode_geo_json))
 
 app = dash.Dash(__name__, external_stylesheets=AppState.external_stylesheets)
 app.layout = html.Div(className='app-layout', children=[
-    # Time control panel
-    html.Div(id='display-panel', children=[
-        dcc.Loading(
-            className="loader",
-            id="loading",
-            type="default",
-            children=[
-                dcc.Markdown(id='data_summary_filtered', children='## Selected %d trips' % (AppState.total_pickup)),
+    dcc.Tabs(id='main-tab', children=[
+        dcc.Tab(label='New York City Traffic', children=[
+            # Time control panel
+            html.Div(id='display-panel', children=[
+                dcc.Loading(
+                    className="loader",
+                    id="loading",
+                    type="default",
+                    children=[
+                        dcc.Markdown(id='data_summary_filtered', children='## Selected %d trips' % (AppState.total_pickup)),
+                    ]),
             ]),
-    ]),
-    html.Div(className="row", id='control-panel-1',style={'width':'100%', 'columnCount': 4},children=[
-        html.Div(className="time selection", children=[
-            html.Label('Select Year'),
-            dcc.RangeSlider(id='year',
-                            value=AppState.year_range,
-                            min=AppState.year_range[0], max=AppState.year_range[-1],
-                            marks={i: str(i) for i in AppState.year_range}),
-        ]),
-        html.Div(className="time selection", children=[
-            html.Label('Select Month'),
-            dcc.RangeSlider(id='months',
-                            value=AppState.month_range,
-                            min=AppState.month_range[0], max=AppState.month_range[-1],
-                            marks={i: str(i) for i in range(AppState.month_range[0], AppState.month_range[-1]+1)}),
-        ]),
-        html.Div(className="time selection", children=[
-            html.Label('Select Day'),
-            dcc.RangeSlider(id='days',
-                            value=AppState.days_range,
-                            min=AppState.days_range[0], max=AppState.days_range[-1],
-                            marks={i: str(i) for i in range(AppState.days_range[0], AppState.days_range[-1]+1, 5)}),
-        ]),
-        html.Div(className="time selection", children=[
-            html.Label('Select Hours'),
-            dcc.RangeSlider(id='hours',
-                            value=AppState.hour_range,
-                            min=AppState.hour_range[0], max=AppState.hour_range[-1],
-                            marks={i: str(i) for i in range(AppState.hour_range[0], AppState.hour_range[-1]+1, 3)}),
-        ]),
-    ]),
-    html.Div(className="row", id='control-panel-2',children=[
-        html.Div(className="time selection", children=[
-            html.Label('Select a day of week'),
-            dcc.Dropdown(id='weekdays',
-                         placeholder='Select a day of week',
-                         options=[{'label': weekday_name, 'value': index} for index, weekday_name in enumerate(weekday_names)],
-                         value=AppState.weekday_range,
-                         multi=True),
+            html.Div(className="row", id='control-panel-1',style={'width':'100%', 'columnCount': 4},children=[
+                html.Div(className="time selection", children=[
+                    html.Label('Select Year'),
+                    dcc.RangeSlider(id='year',
+                                    value=AppState.year_range,
+                                    min=AppState.year_range[0], max=AppState.year_range[-1],
+                                    marks={i: str(i) for i in AppState.year_range}),
+                ]),
+                html.Div(className="time selection", children=[
+                    html.Label('Select Month'),
+                    dcc.RangeSlider(id='months',
+                                    value=AppState.month_range,
+                                    min=AppState.month_range[0], max=AppState.month_range[-1],
+                                    marks={i: str(i) for i in range(AppState.month_range[0], AppState.month_range[-1]+1)}),
+                ]),
+                html.Div(className="time selection", children=[
+                    html.Label('Select Day'),
+                    dcc.RangeSlider(id='days',
+                                    value=AppState.days_range,
+                                    min=AppState.days_range[0], max=AppState.days_range[-1],
+                                    marks={i: str(i) for i in range(AppState.days_range[0], AppState.days_range[-1]+1, 5)}),
+                ]),
+                html.Div(className="time selection", children=[
+                    html.Label('Select Hours'),
+                    dcc.RangeSlider(id='hours',
+                                    value=AppState.hour_range,
+                                    min=AppState.hour_range[0], max=AppState.hour_range[-1],
+                                    marks={i: str(i) for i in range(AppState.hour_range[0], AppState.hour_range[-1]+1, 3)}),
+                ]),
+            ]),
+            html.Div(className="row", id='control-panel-2',children=[
+                html.Div(className="time selection", children=[
+                    html.Label('Select a day of week'),
+                    dcc.Dropdown(id='weekdays',
+                                 placeholder='Select a day of week',
+                                 options=[{'label': weekday_name, 'value': index} for index, weekday_name in enumerate(weekday_names)],
+                                 value=AppState.weekday_range,
+                                 multi=True),
+                ])
+            ]),
+            dcc.Tabs(id='tab', children=[
+                dcc.Tab(label='New York City Traffic Geomap', children=[
+                    html.Div(style={'width': '20%', 'columnCount': 2}, children=[
+                        html.Label('Map Scale: '),
+                        dcc.RadioItems(
+                            id='scale_type',
+                            options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                            value=AppState.scale,
+                            labelStyle={'width': '50%', 'display': 'inline-block'}
+                        )]
+                    ),
+                    html.Div(className="row", children=[
+                        dcc.Graph(id='geo_map',
+                                  figure=AppState.taxi_heatmap)
+                    ])
+                ]),
+                dcc.Tab(label='Compare Traffic Attributes', children=[
+                    html.Div(className="row", children=[
+                        html.Div([
+                            dcc.Dropdown(
+                                id='scatter_x',
+                                options=AppState.get_attribute_list_dict(),
+                                value=AppState.scatter_x
+                            )
+                        ],style={'width': '48%', 'display': 'inline-block'}),
+                        html.Div([
+                            dcc.Dropdown(
+                                id='scatter_y',
+                                options= AppState.get_attribute_list_dict(),
+                                value=AppState.scatter_y
+                            )
+                        ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
+                    ]),
+                    html.Div(className="row", children=[
+                        dcc.Graph(id='scatter_plot',
+                                  figure=AppState.taxi_scatter)
+                    ])
+                ])
         ])
-    ]),
-    dcc.Tabs(id='tab', children=[
-        dcc.Tab(label='New York City Traffic Geomap', children=[
-            html.Div(style={'width': '20%', 'columnCount': 2}, children=[
-                html.Label('Map Scale: '),
-                dcc.RadioItems(
-                    id='scale_type',
-                    options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                    value=AppState.scale,
-                    labelStyle={'width': '50%', 'display': 'inline-block'}
-                )]
-            ),
-            html.Div(className="row", children=[
-                dcc.Graph(id='geo_map',
-                          figure=AppState.taxi_heatmap)
-            ])
         ]),
-        dcc.Tab(label='Compare Traffic Attributes', children=[
-            html.Div(className="row", children=[
-                html.Div([
-                    dcc.Dropdown(
-                        id='scatter_x',
-                        options=AppState.get_attribute_list_dict(),
-                        value=AppState.scatter_x
+        dcc.Tab(label='Traffic vs Covid-19', children=[
+            html.Div([
+                html.Div(className="row",style={'columnCount': 4,'padding-left':'10%'},children=[
+                    html.Label('Picked Data Range'),
+                    dcc.DatePickerRange(
+                        id='date-picker',
+                        min_date_allowed=AppState.covid_start_date,
+                        max_date_allowed=AppState.covid_end_date,
+                        initial_visible_month=AppState.covid_start_date,
+                        start_date=AppState.covid_start_date,
+                        end_date=AppState.covid_end_date
                     )
-                ],style={'width': '48%', 'display': 'inline-block'}),
-                html.Div([
-                    dcc.Dropdown(
-                        id='scatter_y',
-                        options= AppState.get_attribute_list_dict(),
-                        value=AppState.scatter_y
-                    )
-                ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
-            ]),
-            html.Div(className="row", children=[
-                dcc.Graph(id='scatter_plot',
-                          figure=AppState.taxi_scatter)
+                ]),
+                html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap) ])
             ])
         ])
     ])
@@ -129,28 +152,40 @@ app.layout = html.Div(className='app-layout', children=[
               prevent_initial_call=True)
 def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scale_type,scatter_x,scatter_y):
     print(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
-
-    geo_figure = AppState.taxi_heatmap
-    scatter_figure = AppState.taxi_scatter
-
     if not weekday_range:
         weekday_range = list(range(7))
 
     time_change, scale_change, scatter_change = AppState.check_time_scale_scatter_change(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
-
     if time_change:
         Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,
                                                   year_range, month_range, days_range, hour_range,weekday_range)
         AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
 
-
     if time_change or scale_change:
         geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json, AppState.scale)
+    else:
+        geo_figure = AppState.taxi_heatmap
 
     if time_change or scatter_change:
         scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
+    else:
+        scatter_figure = AppState.taxi_scatter
 
     return geo_figure,scatter_figure, '## Selected %d trips' % (AppState.total_pickup)
+
+
+@app.callback(Output('covid-19-map', 'figure'),
+              [Input('date-picker', 'start_date'),
+               Input('date-picker', 'end_date')],
+              prevent_initial_call=True)
+def update_output(start_date, end_date):
+    start_date = date.fromisoformat(start_date).strftime('%Y-%m-%d')
+    end_date = date.fromisoformat(end_date).strftime('%Y-%m-%d')
+    print("Data Range: %s -- %s"%(start_date, end_date))
+
+    df = filter_zipcode_by_time(Data.covid_19, start_date, end_date)
+    AppState.set_covid_heatmap(create_zipcode_geomap(df, Data.zipcode_geo_json))
+    return AppState.covid_heatmap
 
 
 # # Update scatter by change attribute
