@@ -22,6 +22,9 @@ class AppData:
         self.covid_attribute_dropdown = 'num_cases'
         self.zipcode_trip_attribute_dropdown = 'num_pickup'
         self.select_zipcodes =  []
+        self.select_zipcodes_covid_fig = {}
+        self.select_zipcodes_trip_fig = {}
+        self.select_zipcodes_prompt = "### Click on the map to selected zipcode"
 
     def get_attribute_list_dict(self, attributes):
         return [{'label': i, 'value': i} for i in attributes]
@@ -42,6 +45,10 @@ class AppData:
         self.zipcode_trip_df = zipcode_trip_df
         self.zipcode_trip_attribute = zipcode_trip_df.select_dtypes([np.number]).columns.values
 
+    def set_select_zipcodes(self,select_zipcodes_covid_fig, select_zipcodes_trip_fig,select_zipcodes_prompt):
+        self.select_zipcodes_covid_fig = select_zipcodes_covid_fig
+        self.select_zipcodes_trip_fig = select_zipcodes_trip_fig
+        self.select_zipcodes_prompt = select_zipcodes_prompt
 
     def check_attribute_change(self,value_list):
         '''

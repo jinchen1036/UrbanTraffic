@@ -11,7 +11,7 @@ from visualization.graph_functions import *
 from visualization.data_filter import *
 
 
-Data = DataSource("../data")
+Data = DataSource("data")
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
@@ -157,7 +157,8 @@ app.layout = html.Div(className='app-layout', children=[
                     html.Div(className="row",
                              children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap)])
                 ]),
-                html.Div(id='select-zipcode'),
+                # html.Div(id='select-zipcode'),
+                dcc.Markdown(id='select-zipcode',  children=AppState.select_zipcodes_prompt),
                 html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
                     dcc.Graph(id='select-zipcode-covid-plot', figure={}),
                     dcc.Graph(id='select-zipcode-trip-plot', figure={})
@@ -179,7 +180,8 @@ app.layout = html.Div(className='app-layout', children=[
                Input('weekdays', 'value'),
                Input('scale_type', 'value'),
                Input('scatter_x', 'value'),
-               Input('scatter_y', 'value')],
+               Input('scatter_y', 'value')
+               ],
               prevent_initial_call=True)
 def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scale_type,scatter_x,scatter_y):
     print(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
@@ -212,70 +214,102 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
 
 @app.callback([Output('covid-19-map', 'figure'),
                Output('zipcode-trip-map', 'figure'),
-               Output('date-picker-warning','children')],
+               Output('date-picker-warning','children'),
+               Output('select-zipcode-covid-plot', 'figure'),
+               Output('select-zipcode-trip-plot', 'figure'),
+               Output('select-zipcode', 'children')],
               [Input('date-picker', 'start_date'),
                Input('date-picker', 'end_date'),
                Input('covid_attribute_dropdown', 'value'),
-               Input('zipcode_trip_attribute_dropdown','value')],
+               Input('zipcode_trip_attribute_dropdown','value'),
+               Input('covid-19-map', 'clickData'),
+               Input('zipcode-trip-map', 'clickData')
+               ],
               prevent_initial_call=True)
-def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_attribute_dropdown):
+def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_attribute_dropdown,click_covid,click_trip):
     # check time  change
     print("Selected Data Range: %s -- %s" % (start_date, end_date))
     print("%s vs %s" % (covid_attribute_dropdown,zipcode_trip_attribute_dropdown))
     if pd.Timestamp(start_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different start date" % start_date
-        return AppState.covid_heatmap, warning
+        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
     elif pd.Timestamp(end_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different end date" % end_date
-        return AppState.covid_heatmap,AppState.zipcode_trip_heatmap, warning
+        return AppState.covid_heatmap,AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
     else:
         covid_time_dict = {
             'covid_start_date': start_date,  # datetime.fromisoformat(start_date),
             'covid_end_date': end_date,  # datetime.fromisoformat(end_date)
         }
         time_change = AppState.check_attribute_change(covid_time_dict)
+
+        attribute_dict = {
+            'covid_attribute_dropdown': covid_attribute_dropdown,  # datetime.fromisoformat(start_date),
+            'zipcode_trip_attribute_dropdown': zipcode_trip_attribute_dropdown,  # datetime.fromisoformat(end_date)
+        }
+        attribute_change = AppState.check_attribute_change(attribute_dict)
+
         if time_change:
             covid_df, zipcode_trip_df = filter_zipcode_by_time(Data.covid_19, Data.zipcode_trip_df,Data.agg_column,
                                                                   start_day=AppState.covid_start_date,
                                                                   end_day =AppState.covid_end_date)
             AppState.set_attribute_names(covid_df, zipcode_trip_df)
 
-        AppState.covid_attribute_dropdown = covid_attribute_dropdown
-        AppState.zipcode_trip_attribute_dropdown = zipcode_trip_attribute_dropdown
-        covid_map, zipcode_trip_map = create_zipcode_geomap(AppState.covid_df, AppState.zipcode_trip_df,
-                                                            Data.zipcode_geo_json, AppState.covid_attribute_dropdown,
-                                                            AppState.zipcode_trip_attribute_dropdown)
-        AppState.set_covid_heatmap(covid_map, zipcode_trip_map)
-        return covid_map, zipcode_trip_map, ""
 
-@app.callback([Output('select-zipcode-covid-plot','figure'),
-               Output('select-zipcode-trip-plot','figure'),
-               Output('select-zipcode','children')],
-                [Input('covid-19-map', 'clickData'),
-                Input('zipcode-trip-map', 'clickData')],
-              prevent_initial_call=True)
-def click_map(click_covid,click_trip):
-    trg = dash.callback_context.triggered
-    print('Interaction: click on popular destinations tab detected: %r', trg)
 
-    if click_trip is not None:
-        zipcode = click_trip['points'][0]['location']
-    else:
-        zipcode = click_covid['points'][0]['location'] # 11226 int
+        if time_change or attribute_change:
+            covid_map, zipcode_trip_map = create_zipcode_geomap(AppState.covid_df, AppState.zipcode_trip_df,
+                                                                Data.zipcode_geo_json, AppState.covid_attribute_dropdown,
+                                                                AppState.zipcode_trip_attribute_dropdown)
+            AppState.set_covid_heatmap(covid_map, zipcode_trip_map)
 
-    if zipcode in AppState.select_zipcodes:
-        AppState.select_zipcodes.remove(zipcode)
-    else:
-        AppState.select_zipcodes.append(zipcode)
+        if not time_change and not attribute_change:
+            trg = dash.callback_context.triggered
+            zipcode = trg[0]['value']['points'][0]['location']
 
-    if not AppState.select_zipcodes:
-        return {},{},"### No selected zipcode"
-    covid_df, zipcode_trip_df  = get_select_zipcodes_from_time_interval(Data.covid_19, Data.zipcode_trip_df,AppState.select_zipcodes,
-                                                                  start_day=AppState.covid_start_date,
-                                                                  end_day =AppState.covid_end_date)
-    covid_line = create_line_fig_by_zipcode(covid_df, AppState.covid_attribute_dropdown)
-    zipcode_trip_line = create_line_fig_by_zipcode(zipcode_trip_df, AppState.zipcode_trip_attribute_dropdown)
-    return covid_line, zipcode_trip_line, '### Selected Zipcodes: %s'%(', '.join(map(str, AppState.select_zipcodes)))
+            if zipcode in AppState.select_zipcodes:
+                AppState.select_zipcodes.remove(zipcode)
+            else:
+                AppState.select_zipcodes.append(zipcode)
+
+            if not AppState.select_zipcodes:
+                AppState.set_select_zipcodes({}, {}, "### Click on the map to selected zipcode")
+                return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+
+
+        # must change no matter what
+        covid_df, zipcode_trip_df = get_select_zipcodes_from_time_interval(Data.covid_19, Data.zipcode_trip_df,
+                                                                           AppState.select_zipcodes,
+                                                                           start_day=AppState.covid_start_date,
+                                                                           end_day=AppState.covid_end_date)
+        show_prompt = '### Selected Zipcodes: %s' % (', '.join(map(str, AppState.select_zipcodes)))
+        if covid_df.empty:
+            show_prompt += "- No COVID-19 data available"
+            covid_line = {}
+        else:
+            covid_line = create_line_fig_by_zipcode(covid_df, AppState.covid_attribute_dropdown)
+
+        if zipcode_trip_df.empty:
+            show_prompt += "- No Trip data available"
+            zipcode_trip_line = {}
+        else:
+            zipcode_trip_line = create_line_fig_by_zipcode(zipcode_trip_df,
+                                                           AppState.zipcode_trip_attribute_dropdown)
+
+        AppState.set_select_zipcodes(covid_line, zipcode_trip_line, show_prompt)
+
+        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+
+# @app.callback([],
+#                [Input('covid-19-map', 'clickData'),
+#                 Input('zipcode-trip-map', 'clickData')],
+#               prevent_initial_call=True)
+# def click_map(click_covid,click_trip):
+
+
+
+
+    # return
 
 
 if __name__ == '__main__':
