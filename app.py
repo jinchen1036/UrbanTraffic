@@ -11,7 +11,7 @@ from visualization.graph_functions import *
 from visualization.data_filter import *
 
 
-Data = DataSource("data")
+Data = DataSource("../data")
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
@@ -136,23 +136,31 @@ app.layout = html.Div(className='app-layout', children=[
                     ]),
                     html.Div(id='date-picker-warning'),
                 ]),
-                html.Div(style={'width':'100%','columnCount': 2}, children=[
-                    html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap) ]),
-                    html.Div(className="row", children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap) ])
-                ]),
-                html.Div(style={'columnCount': 2,'display':'flex'},children=[
+                html.Div(style={'columnCount': 4,'display':'flex'},children=[
+                    html.Label('Picked Left Map Attributed'),
                     dcc.Dropdown(
                         id='covid_attribute_dropdown',multi=False,
                         options=AppState.get_attribute_list_dict(AppState.covid_attribute),
                         value=AppState.covid_attribute_dropdown,
-                        style={'width': '50%','padding-left':'20%'}
+                        style={'width': '50%'}
                     ),
+                    html.Label('Picked Right Map Attributed'),
                     dcc.Dropdown(
                         id='zipcode_trip_attribute_dropdown',multi=False,
                         options=AppState.get_attribute_list_dict(AppState.zipcode_trip_attribute),
                         value=AppState.zipcode_trip_attribute_dropdown,
-                        style={'width': '50%','padding-left':'10%'}
+                        style={'width': '50%'} #,'padding-left':'10%'
                     )
+                ]),
+                html.Div(style={'width': '100%', 'columnCount': 2}, children=[
+                    html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap)]),
+                    html.Div(className="row",
+                             children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap)])
+                ]),
+                html.Div(id='select-zipcode'),
+                html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
+                    dcc.Graph(id='select-zipcode-covid-plot', figure={}),
+                    dcc.Graph(id='select-zipcode-trip-plot', figure={})
                 ])
             ])
         ])
@@ -238,21 +246,37 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
                                                             Data.zipcode_geo_json, AppState.covid_attribute_dropdown,
                                                             AppState.zipcode_trip_attribute_dropdown)
         AppState.set_covid_heatmap(covid_map, zipcode_trip_map)
-
         return covid_map, zipcode_trip_map, ""
 
+@app.callback([Output('select-zipcode-covid-plot','figure'),
+               Output('select-zipcode-trip-plot','figure'),
+               Output('select-zipcode','children')],
+                [Input('covid-19-map', 'clickData'),
+                Input('zipcode-trip-map', 'clickData')],
+              prevent_initial_call=True)
+def click_map(click_covid,click_trip):
+    trg = dash.callback_context.triggered
+    print('Interaction: click on popular destinations tab detected: %r', trg)
 
-# # Update scatter by change attribute
-# # Update figures by select time
-# @app.callback(Output('scatter_plot', 'figure'),
-#               [Input('scatter_x', 'value'),
-#                Input('scatter_y', 'value')],
-#               prevent_initial_call=True)
-# def update_scatter_plot(scatter_x, scatter_y):
-#     AppState.scatter_x = scatter_x
-#     AppState.scatter_y = scatter_y
-#     scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y)
-#     return scatter_figure
+    if click_trip is not None:
+        zipcode = click_trip['points'][0]['location']
+    else:
+        zipcode = click_covid['points'][0]['location'] # 11226 int
+
+    if zipcode in AppState.select_zipcodes:
+        AppState.select_zipcodes.remove(zipcode)
+    else:
+        AppState.select_zipcodes.append(zipcode)
+
+    if not AppState.select_zipcodes:
+        return {},{},"### No selected zipcode"
+    covid_df, zipcode_trip_df  = get_select_zipcodes_from_time_interval(Data.covid_19, Data.zipcode_trip_df,AppState.select_zipcodes,
+                                                                  start_day=AppState.covid_start_date,
+                                                                  end_day =AppState.covid_end_date)
+    covid_line = create_line_fig_by_zipcode(covid_df, AppState.covid_attribute_dropdown)
+    zipcode_trip_line = create_line_fig_by_zipcode(zipcode_trip_df, AppState.zipcode_trip_attribute_dropdown)
+    return covid_line, zipcode_trip_line, '### Selected Zipcodes: %s'%(', '.join(map(str, AppState.select_zipcodes)))
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

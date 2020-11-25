@@ -25,8 +25,8 @@ def create_geomap(filter_df, geo_json, scale, zoom=9.5,center={"lat": 40.7, "lon
                                width=1300, height=600
                                )
 
-    fig.update_traces(colorbar=None)
-    fig.update_traces(showscale=False)
+
+    # fig.update_traces(coloraxis_showscale=False, showlegend=False)
     return fig
 
 def create_scatter_plot(filter_df, attribute_x,attribute_y):
@@ -69,3 +69,11 @@ def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcod
                                width=730, height=600
                                )
     return covid_fig, zipcode_trip_fig
+
+
+
+def create_line_fig_by_zipcode(filter_df,attribute_y):
+    fig = px.line(filter_df, x=filter_df.index, y=attribute_y, color='zipcode')
+    fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
+
+    return fig

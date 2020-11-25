@@ -21,6 +21,7 @@ class AppData:
 
         self.covid_attribute_dropdown = 'num_cases'
         self.zipcode_trip_attribute_dropdown = 'num_pickup'
+        self.select_zipcodes =  []
 
     def get_attribute_list_dict(self, attributes):
         return [{'label': i, 'value': i} for i in attributes]

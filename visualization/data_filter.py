@@ -65,6 +65,18 @@ def filter_zipcode_by_time(covid_df,zipcode_trip,agg_column, start_day, end_day)
                                           group_by_criteria='zipcode')
 
     return final_df, zipcode_trip_group
+
+def get_select_zipcodes_from_time_interval(covid_df,zipcode_trip, zipcodes ,start_day, end_day):
+
+    # filter by time
+    covid_df = covid_df.loc[start_day:end_day]
+    zipcode_trip = zipcode_trip.loc[start_day:end_day]
+
+    # filter by zipcodes
+    covid_df = covid_df[np.isin(covid_df['zipcode'], zipcodes)]
+    zipcode_trip = zipcode_trip[np.isin(zipcode_trip['zipcode'], zipcodes)]
+
+    return covid_df, zipcode_trip
 #
 #
 # year_range = [2019, 2020]
