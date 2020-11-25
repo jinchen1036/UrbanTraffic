@@ -1,4 +1,4 @@
-from datetime import date
+# from datetime import date
 class AppData:
     def __init__(self, column_names, total_pickup,total_dropoff):
         self.external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -16,8 +16,8 @@ class AppData:
         self.weekday_range = list(range(7))
 
         #
-        self.covid_start_date = date(2020, 3, 31)
-        self.covid_end_date = date(2020, 5, 17)
+        self.covid_start_date = "2020-03-31" #date(2020, 3, 31)
+        self.covid_end_date = "2020-05-17" #date(2020, 5, 17)
 
     def get_attribute_list_dict(self):
         return [{'label': i, 'value': i} for i in self.attributes]

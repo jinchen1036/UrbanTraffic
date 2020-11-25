@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -19,8 +19,8 @@ AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
 AppState.set_taxi_heatmap(create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json,AppState.scale))
 AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
 AppState.set_covid_heatmap(create_zipcode_geomap(filter_zipcode_by_time(Data.covid_19,
-                                                                        start_day=AppState.covid_start_date.strftime('%Y-%m-%d'),
-                                                                        end_day =AppState.covid_end_date.strftime('%Y-%m-%d') ),
+                                                                        start_day=AppState.covid_start_date,
+                                                                        end_day =AppState.covid_end_date),
                                                  Data.zipcode_geo_json))
 
 app = dash.Dash(__name__, external_stylesheets=AppState.external_stylesheets)
@@ -185,25 +185,24 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
               prevent_initial_call=True)
 def update_output(start_date, end_date):
     # check time  change
-    covid_time_dict = {
-        'covid_start_date': date.fromisoformat(start_date),
-        'covid_end_date': date.fromisoformat(end_date)
-    }
+    print("Selected Data Range: %s -- %s" % (start_date, end_date))
 
-    if covid_time_dict['covid_start_date'] not in Data.covid_available_days:
-        warning = "There is no data available for %s, please select a different start date" % covid_time_dict['covid_start_date'].strftime('%Y-%m-%d')
+    if pd.Timestamp(start_date,tz='UTC') not in Data.covid_available_days:
+        warning = "There is no data available for %s, please select a different start date" % start_date
         return AppState.covid_heatmap, warning
-    elif covid_time_dict['covid_end_date'] not in Data.covid_available_days:
-        warning = "There is no data available for %s, please select a different end date" % covid_time_dict['covid_end_date'].strftime('%Y-%m-%d')
+    elif pd.Timestamp(end_date,tz='UTC') not in Data.covid_available_days:
+        warning = "There is no data available for %s, please select a different end date" % end_date
         return AppState.covid_heatmap, warning
     else:
+        covid_time_dict = {
+            'covid_start_date': start_date,  # datetime.fromisoformat(start_date),
+            'covid_end_date': end_date,  # datetime.fromisoformat(end_date)
+        }
         time_change = AppState.check_attribute_change(covid_time_dict)
         if time_change:
-            print("Data Range: %s -- %s"%(AppState.covid_start_date.strftime('%Y-%m-%d'), AppState.covid_end_date.strftime('%Y-%m-%d')))
-
             df = filter_zipcode_by_time(Data.covid_19,
-                                        start_day=AppState.covid_start_date.strftime('%Y-%m-%d'),
-                                        end_day =AppState.covid_end_date.strftime('%Y-%m-%d'))
+                                        start_day=AppState.covid_start_date,
+                                        end_day =AppState.covid_end_date)
             geo_map = create_zipcode_geomap(df, Data.zipcode_geo_json)
             AppState.covid_heatmap = geo_map
         else:

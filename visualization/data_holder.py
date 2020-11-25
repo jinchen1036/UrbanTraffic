@@ -56,3 +56,9 @@ class DataSource:
 
         yellow_taxi_data.set_index('time', inplace=True)
         return yellow_taxi_data
+
+    def get_yellow_taxi_by_zone(self):
+        df = self.taxi_trip_df.reset_index()
+        df2 = pd.merge(df, self.taxi_zone_df, left_on='zone',
+                        right_on='zone')
+        df3 = df2.groupby(['time','zipcode']).apply(combine_zone_info)
