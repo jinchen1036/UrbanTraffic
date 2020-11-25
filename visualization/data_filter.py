@@ -54,7 +54,7 @@ def filter_zipcode_by_time(covid_df,  start_day, end_day):
 
     start_df = covid_df.loc[start_day]
     end_df = covid_df.loc[end_day, ['zipcode', 'num_cases', 'num_test']]
-
+# df["Time"].dt.normalize().unique()
     final_df = pd.merge(start_df, end_df, how='inner', on=['zipcode'])
     final_df['num_cases'] = final_df['num_cases_y'] - final_df['num_cases_x']
     final_df['num_tests'] = final_df['num_test_y'] - final_df['num_test_x']

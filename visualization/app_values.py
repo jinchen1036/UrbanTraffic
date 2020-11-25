@@ -54,7 +54,7 @@ class AppData:
 
 
     def check_time_scale_scatter_change(self,year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y):
-        # check time  change
+        # check time change
         time_dict = {
             'year_range': year_range,
             'month_range': month_range,

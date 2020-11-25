@@ -1,15 +1,15 @@
+from datetime import date
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from datetime import date
+# from flask_caching import Cache
 
 from data.config import *
 from visualization.data_holder import DataSource
 from visualization.app_values import AppData
 from visualization.graph_functions import *
 from visualization.data_filter import *
-
 
 
 Data = DataSource()
@@ -119,16 +119,18 @@ app.layout = html.Div(className='app-layout', children=[
         ]),
         dcc.Tab(label='Traffic vs Covid-19', children=[
             html.Div([
-                html.Div(className="row",style={'columnCount': 4,'padding-left':'10%'},children=[
-                    html.Label('Picked Data Range'),
-                    dcc.DatePickerRange(
-                        id='date-picker',
-                        min_date_allowed=AppState.covid_start_date,
-                        max_date_allowed=AppState.covid_end_date,
-                        initial_visible_month=AppState.covid_start_date,
-                        start_date=AppState.covid_start_date,
-                        end_date=AppState.covid_end_date
-                    )
+                html.Div(className="row",children=[
+                    html.Div(className="row",children=[
+                        html.Label('Picked Data Range'),
+                        dcc.DatePickerRange(
+                            id='date-picker',
+                            min_date_allowed=AppState.covid_start_date,
+                            max_date_allowed=AppState.covid_end_date,
+                            initial_visible_month=AppState.covid_start_date,
+                            start_date=AppState.covid_start_date,
+                            end_date=AppState.covid_end_date)
+                    ]),
+                    html.Div(id='date-picker-warning'),
                 ]),
                 html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap) ])
             ])
@@ -163,29 +165,50 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
 
     if time_change or scale_change:
         geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json, AppState.scale)
+        AppState.taxi_heatmap = geo_figure
     else:
         geo_figure = AppState.taxi_heatmap
 
     if time_change or scatter_change:
         scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
+        AppState.taxi_scatter = scatter_figure
     else:
         scatter_figure = AppState.taxi_scatter
 
     return geo_figure,scatter_figure, '## Selected %d trips' % (AppState.total_pickup)
 
 
-@app.callback(Output('covid-19-map', 'figure'),
+@app.callback([Output('covid-19-map', 'figure'),
+               Output('date-picker-warning','children')],
               [Input('date-picker', 'start_date'),
                Input('date-picker', 'end_date')],
               prevent_initial_call=True)
 def update_output(start_date, end_date):
-    start_date = date.fromisoformat(start_date).strftime('%Y-%m-%d')
-    end_date = date.fromisoformat(end_date).strftime('%Y-%m-%d')
-    print("Data Range: %s -- %s"%(start_date, end_date))
+    # check time  change
+    covid_time_dict = {
+        'covid_start_date': date.fromisoformat(start_date),
+        'covid_end_date': date.fromisoformat(end_date)
+    }
 
-    df = filter_zipcode_by_time(Data.covid_19, start_date, end_date)
-    AppState.set_covid_heatmap(create_zipcode_geomap(df, Data.zipcode_geo_json))
-    return AppState.covid_heatmap
+    if covid_time_dict['covid_start_date'] not in Data.covid_available_days:
+        warning = "There is no data available for %s, please select a different start date" % covid_time_dict['covid_start_date'].strftime('%Y-%m-%d')
+        return AppState.covid_heatmap, warning
+    elif covid_time_dict['covid_end_date'] not in Data.covid_available_days:
+        warning = "There is no data available for %s, please select a different end date" % covid_time_dict['covid_end_date'].strftime('%Y-%m-%d')
+        return AppState.covid_heatmap, warning
+    else:
+        time_change = AppState.check_attribute_change(covid_time_dict)
+        if time_change:
+            print("Data Range: %s -- %s"%(AppState.covid_start_date.strftime('%Y-%m-%d'), AppState.covid_end_date.strftime('%Y-%m-%d')))
+
+            df = filter_zipcode_by_time(Data.covid_19,
+                                        start_day=AppState.covid_start_date.strftime('%Y-%m-%d'),
+                                        end_day =AppState.covid_end_date.strftime('%Y-%m-%d'))
+            geo_map = create_zipcode_geomap(df, Data.zipcode_geo_json)
+            AppState.covid_heatmap = geo_map
+        else:
+            geo_map = AppState.covid_heatmap
+        return geo_map, ""
 
 
 # # Update scatter by change attribute

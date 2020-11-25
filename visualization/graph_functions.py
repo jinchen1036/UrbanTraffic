@@ -50,7 +50,7 @@ def create_zipcode_geomap(filter_df, geo_json, zoom=9.5,center={"lat": 40.7, "lo
                                locations="zipcode",
                                featureidkey="properties.postalCode",
                                mapbox_style="carto-positron",
-                               hover_data=['neighborhood','population','median_household_income','zipcode'],
+                               hover_data=['neighborhood','population','median_household_income','zipcode','num_tests'],
                                zoom=zoom,
                                center=center,
                                opacity=0.5,

@@ -8,6 +8,8 @@ class DataSource:
         self.taxi_geo_json = self.get_taxi_zone_geo()
         self.taxi_zone_df = self.get_taxi_zone()
         self.covid_19 = self.get_covid_19()
+        self.covid_available_days = pd.Series(self.covid_19.index).dt.normalize().unique()
+
         self.zipcode_geo_json = self.get_zip_code_geo()
         self.taxi_trip_df = self.get_yellow_taxi_data()
         self.taxi_trip_filter_df = filter_by_time(self.taxi_trip_df,self.taxi_zone_df, year_range = [2019, 2020],
@@ -29,6 +31,7 @@ class DataSource:
         # covid_19['time'] = pd.to_datetime(dict(year=2020, month=covid_19.month, day=covid_19.day))
         # covid_19.drop(['month', 'day'], axis=1, inplace=True)
         covid_19.set_index('time', inplace=True)
+
         return covid_19
 
     def get_taxi_zone(self):
