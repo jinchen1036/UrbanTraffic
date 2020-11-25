@@ -19,12 +19,18 @@
 # Visualization
 - To run the visualization - have complete the setup 
 ```
-    cd visualization
-    python main.py
+    python app.py
 ```
 - The file for running the visualization is in [**visualization/main.py**](https://github.com/jinchen1036/UrbanTraffic/blob/main/visualization/main.py)
     - [plotly](https://plotly.com/python/plotly-fundamentals/) is use as the main visualization package
     
+# Deployment
+[Live Link]()
+```.env
+    git push heroku main 
+```
+
+ 
 # Data Format
 ### taxi_zone_info_all.csv
 - location_id   (taxi zone id)
