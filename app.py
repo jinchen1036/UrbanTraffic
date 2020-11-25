@@ -12,7 +12,7 @@ from visualization.graph_functions import *
 from visualization.data_filter import *
 
 
-Data = DataSource()
+Data = DataSource("data")
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
