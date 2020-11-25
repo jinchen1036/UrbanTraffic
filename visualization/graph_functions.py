@@ -41,10 +41,10 @@ def create_scatter_plot(filter_df, attribute_x,attribute_y):
 
     return fig
 
-def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, zoom=8.5,center={"lat": 40.7, "lon": -73.99}):
+def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcode_attr, zoom=8.5,center={"lat": 40.7, "lon": -73.99}):
     covid_fig = px.choropleth_mapbox(covid_df,
                                      geojson=geo_json,
-                                     color="num_cases",
+                                     color=covid_attr,
                                      locations="zipcode",
                                      featureidkey="properties.postalCode",
                                      mapbox_style="carto-positron",
@@ -55,7 +55,7 @@ def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, zoom=8.5,center={
                                      )
     zipcode_trip_fig = px.choropleth_mapbox(zipcode_trip_df,
                                geojson=geo_json,
-                               color="num_pickup",
+                               color=zipcode_attr,
                                locations="zipcode",
                                featureidkey="properties.postalCode",
                                mapbox_style="carto-positron",

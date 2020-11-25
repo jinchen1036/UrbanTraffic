@@ -1,11 +1,11 @@
-# from datetime import date
+import numpy as np
 class AppData:
     def __init__(self, column_names, total_pickup,total_dropoff):
         self.external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
         self.scatter_x = 'avg_trip_distance'
         self.scatter_y = 'avg_total_price'
         self.scale = 'Linear'
-        self.attributes = column_names
+        self.trip_attributes = column_names
         self.total_pickup = total_pickup
         self.total_dropoff = total_dropoff
 
@@ -19,8 +19,11 @@ class AppData:
         self.covid_start_date = "2020-03-31" #date(2020, 3, 31)
         self.covid_end_date = "2020-05-17" #date(2020, 5, 17)
 
-    def get_attribute_list_dict(self):
-        return [{'label': i, 'value': i} for i in self.attributes]
+        self.covid_attribute_dropdown = 'num_cases'
+        self.zipcode_trip_attribute_dropdown = 'num_pickup'
+
+    def get_attribute_list_dict(self, attributes):
+        return [{'label': i, 'value': i} for i in attributes]
 
     def set_taxi_heatmap(self, taxi_heatmap):
         self.taxi_heatmap = taxi_heatmap
@@ -31,6 +34,13 @@ class AppData:
     def set_covid_heatmap(self, covid_heatmap, zipcode_trip_heatmap):
         self.covid_heatmap = covid_heatmap
         self.zipcode_trip_heatmap = zipcode_trip_heatmap
+
+    def set_attribute_names(self,covid_df, zipcode_trip_df):
+        self.covid_df = covid_df
+        self.covid_attribute = covid_df.select_dtypes([np.number]).columns.values
+        self.zipcode_trip_df = zipcode_trip_df
+        self.zipcode_trip_attribute = zipcode_trip_df.select_dtypes([np.number]).columns.values
+
 
     def check_attribute_change(self,value_list):
         '''

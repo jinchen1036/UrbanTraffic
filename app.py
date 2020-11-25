@@ -11,7 +11,7 @@ from visualization.graph_functions import *
 from visualization.data_filter import *
 
 
-Data = DataSource("data")
+Data = DataSource()
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
                    total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
                    total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
@@ -20,8 +20,9 @@ AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_trip_filter_df, AppState
 covid_df, zipcode_trip_df = filter_zipcode_by_time(Data.covid_19, Data.zipcode_trip_df, Data.agg_column,
                                                       start_day=AppState.covid_start_date,
                                                       end_day=AppState.covid_end_date)
-AppState.set_covid_heatmap(*create_zipcode_geomap(covid_df,zipcode_trip_df,
-                                                 Data.zipcode_geo_json))
+AppState.set_attribute_names(covid_df, zipcode_trip_df)
+AppState.set_covid_heatmap(*create_zipcode_geomap(covid_df,zipcode_trip_df, Data.zipcode_geo_json,
+                                                  AppState.covid_attribute_dropdown, AppState.zipcode_trip_attribute_dropdown))
 del covid_df, zipcode_trip_df
 
 
@@ -101,14 +102,14 @@ app.layout = html.Div(className='app-layout', children=[
                         html.Div([
                             dcc.Dropdown(
                                 id='scatter_x',
-                                options=AppState.get_attribute_list_dict(),
+                                options=AppState.get_attribute_list_dict(AppState.trip_attributes),
                                 value=AppState.scatter_x
                             )
                         ],style={'width': '48%', 'display': 'inline-block'}),
                         html.Div([
                             dcc.Dropdown(
                                 id='scatter_y',
-                                options= AppState.get_attribute_list_dict(),
+                                options= AppState.get_attribute_list_dict(AppState.trip_attributes),
                                 value=AppState.scatter_y
                             )
                         ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
@@ -138,6 +139,20 @@ app.layout = html.Div(className='app-layout', children=[
                 html.Div(style={'columnCount': 2}, children=[
                     html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap) ]),
                     html.Div(className="row", children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap) ])
+                ]),
+                html.Div(style={'columnCount': 2,'display':'flex'},children=[
+                    dcc.Dropdown(
+                        id='covid_attribute_dropdown',multi=False,
+                        options=AppState.get_attribute_list_dict(AppState.covid_attribute),
+                        value=AppState.covid_attribute_dropdown,
+                        style={'width': '50%'}
+                    ),
+                    dcc.Dropdown(
+                        id='zipcode_trip_attribute_dropdown',multi=False,
+                        options=AppState.get_attribute_list_dict(AppState.zipcode_trip_attribute),
+                        value=AppState.zipcode_trip_attribute_dropdown,
+                        style={'width': '50%'}
+                    )
                 ])
             ])
         ])
@@ -191,12 +206,14 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
                Output('zipcode-trip-map', 'figure'),
                Output('date-picker-warning','children')],
               [Input('date-picker', 'start_date'),
-               Input('date-picker', 'end_date')],
+               Input('date-picker', 'end_date'),
+               Input('covid_attribute_dropdown', 'value'),
+               Input('zipcode_trip_attribute_dropdown','value')],
               prevent_initial_call=True)
-def update_output(start_date, end_date):
+def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_attribute_dropdown):
     # check time  change
     print("Selected Data Range: %s -- %s" % (start_date, end_date))
-
+    print("%s vs %s" % (covid_attribute_dropdown,zipcode_trip_attribute_dropdown))
     if pd.Timestamp(start_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different start date" % start_date
         return AppState.covid_heatmap, warning
@@ -210,14 +227,18 @@ def update_output(start_date, end_date):
         }
         time_change = AppState.check_attribute_change(covid_time_dict)
         if time_change:
-            covid_df, zipcode_trip_group = filter_zipcode_by_time(Data.covid_19, Data.zipcode_trip_df,Data.agg_column,
+            covid_df, zipcode_trip_df = filter_zipcode_by_time(Data.covid_19, Data.zipcode_trip_df,Data.agg_column,
                                                                   start_day=AppState.covid_start_date,
                                                                   end_day =AppState.covid_end_date)
-            covid_map, zipcode_trip_map = create_zipcode_geomap(covid_df, zipcode_trip_group, Data.zipcode_geo_json)
-            AppState.set_covid_heatmap(covid_map, zipcode_trip_map)
-        else:
-            covid_map = AppState.covid_heatmap
-            zipcode_trip_map = AppState.zipcode_trip_heatmap
+            AppState.set_attribute_names(covid_df, zipcode_trip_df)
+
+        AppState.covid_attribute_dropdown = covid_attribute_dropdown
+        AppState.zipcode_trip_attribute_dropdown = zipcode_trip_attribute_dropdown
+        covid_map, zipcode_trip_map = create_zipcode_geomap(AppState.covid_df, AppState.zipcode_trip_df,
+                                                            Data.zipcode_geo_json, AppState.covid_attribute_dropdown,
+                                                            AppState.zipcode_trip_attribute_dropdown)
+        AppState.set_covid_heatmap(covid_map, zipcode_trip_map)
+
         return covid_map, zipcode_trip_map, ""
 
 
