@@ -4,6 +4,7 @@ class AppData:
         self.external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
         self.scatter_x = 'avg_trip_distance'
         self.scatter_y = 'avg_total_price'
+        self.geo_map_attribute = 'num_pickup'
         self.scale = 'Linear'
         self.trip_attributes = column_names
         self.total_pickup = total_pickup
@@ -14,14 +15,15 @@ class AppData:
         self.days_range =[1, 31]
         self.hour_range =[0, 23]
         self.weekday_range = list(range(7))
-
+        self.select_geomap_zone = []
+        self.select_geomap_zone_name = []
         #
         self.covid_start_date = "2020-03-31" #date(2020, 3, 31)
         self.covid_end_date = "2020-05-17" #date(2020, 5, 17)
 
         self.covid_attribute_dropdown = 'num_cases'
         self.zipcode_trip_attribute_dropdown = 'num_pickup'
-        self.select_zipcodes =  []
+        self.select_zipcodes = []
         self.select_zipcodes_covid_fig = {}
         self.select_zipcodes_trip_fig = {}
         self.select_zipcodes_prompt = "### Click on the map to selected zipcode"
@@ -71,7 +73,7 @@ class AppData:
         return change
 
 
-    def check_time_scale_scatter_change(self,year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y):
+    def check_time_scale_scatter_change(self,year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y, geo_map_attribute):
         # check time change
         time_dict = {
             'year_range': year_range,
@@ -92,4 +94,5 @@ class AppData:
         }
         scatter_change = self.check_attribute_change(scatter_dict)
 
-        return time_change, scale_change, scatter_change
+        map_attribute_change = self.check_attribute_change({"geo_map_attribute": geo_map_attribute})
+        return time_change, scale_change, scatter_change, map_attribute_change

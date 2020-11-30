@@ -13,10 +13,10 @@ from visualization.data_filter import *
 
 Data = DataSource("data")
 AppState = AppData(column_names=Data.taxi_trip_df.columns.values,
-                   total_pickup=Data.taxi_trip_filter_df.num_pickup.sum(),
-                   total_dropoff = Data.taxi_trip_filter_df.num_dropoff.sum())
-AppState.set_taxi_heatmap(create_geomap(Data.taxi_trip_filter_df,Data.taxi_geo_json,AppState.scale))
-AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x,AppState.scatter_y))
+                   total_pickup=Data.taxi_merge_df.num_pickup.sum(),
+                   total_dropoff = Data.taxi_merge_df.num_dropoff.sum())
+AppState.set_taxi_heatmap(create_geomap(Data.taxi_merge_df,Data.taxi_geo_json,AppState.scale))
+AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_merge_df, AppState.scatter_x,AppState.scatter_y))
 covid_df, zipcode_trip_df = filter_zipcode_by_time(Data.covid_19, Data.zipcode_trip_df, Data.agg_column,
                                                       start_day=AppState.covid_start_date,
                                                       end_day=AppState.covid_end_date)
@@ -83,19 +83,29 @@ app.layout = html.Div(className='app-layout', children=[
             ]),
             dcc.Tabs(id='tab', children=[
                 dcc.Tab(label='New York City Traffic Geomap', children=[
-                    html.Div(style={'width': '20%', 'columnCount': 2}, children=[
-                        html.Label('Map Scale: '),
-                        dcc.RadioItems(
-                            id='scale_type',
-                            options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                            value=AppState.scale,
-                            labelStyle={'width': '50%', 'display': 'inline-block'}
-                        )]
-                    ),
+                    html.Div(style={'columnCount': 3, 'display': 'flex'}, children=[
+                        html.Div(style={'width': '50%', 'columnCount': 2}, children=[
+                            html.Label('Map Scale: '),
+                            dcc.RadioItems(
+                                id='scale_type',
+                                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                                value=AppState.scale,
+                                labelStyle={'width': '50%', 'display': 'inline-block'}
+                            )]
+                        ),
+                        html.Label('Picked Attributed'),
+                        dcc.Dropdown(
+                            id='geo_map_attribute',
+                            options=AppState.get_attribute_list_dict(AppState.trip_attributes),
+                            value=AppState.geo_map_attribute,
+                            style={'width': '50%'}
+                        )
+                    ]),
                     html.Div(className="row", children=[
                         dcc.Graph(id='geo_map',
                                   figure=AppState.taxi_heatmap)
-                    ])
+                    ]),
+                    dcc.Graph(id='select-geo-map-scatter-plot', figure={})
                 ]),
                 dcc.Tab(label='Compare Traffic Attributes', children=[
                     html.Div(className="row", children=[
@@ -172,7 +182,8 @@ app.layout = html.Div(className='app-layout', children=[
 # Update figures by select time
 @app.callback([Output('geo_map', 'figure'),
                Output('scatter_plot', 'figure'),
-               Output('data_summary_filtered', 'children')],
+               Output('data_summary_filtered', 'children'),
+               Output('select-geo-map-scatter-plot', 'figure')],
               [Input('year', 'value'),
                Input('months', 'value'),
                Input('days', 'value'),
@@ -180,36 +191,46 @@ app.layout = html.Div(className='app-layout', children=[
                Input('weekdays', 'value'),
                Input('scale_type', 'value'),
                Input('scatter_x', 'value'),
-               Input('scatter_y', 'value')
+               Input('scatter_y', 'value'),
+               Input('geo_map_attribute','value'),
+               Input('geo_map', 'clickData')
                ],
               prevent_initial_call=True)
-def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scale_type,scatter_x,scatter_y):
+def update_figure_by_time(year_range, month_range, days_range, hour_range,weekday_range,scale_type,scatter_x,scatter_y,geo_map_attribute,click_geo):
     print(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
     if not weekday_range:
         weekday_range = list(range(7))
 
-    time_change, scale_change, scatter_change = AppState.check_time_scale_scatter_change(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y)
+    time_change, scale_change, scatter_change, map_attribute_change = AppState.check_time_scale_scatter_change(year_range, month_range, days_range, hour_range,weekday_range,scale_type, scatter_x,scatter_y,geo_map_attribute)
     if time_change:
-        Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,Data.taxi_zone_df,Data.agg_column,
-                                                  year_range, month_range, days_range, hour_range,weekday_range)
-        if Data.taxi_trip_filter_df.empty:
+        Data.taxi_trip_filter_df = filter_by_time(Data.taxi_trip_df,year_range, month_range, days_range, hour_range,weekday_range)
+        Data.taxi_merge_df = merge_yellow_taxi_data(Data.taxi_trip_filter_df,Data.taxi_zone_df, Data.agg_column)
+        if Data.taxi_merge_df.empty:
             AppState.total_pickup = 0
             return AppState.taxi_heatmap,AppState.taxi_scatter, '## No trip data available for this time period, please reselect the time range'
-        AppState.total_pickup = Data.taxi_trip_filter_df.num_pickup.sum()
+        AppState.total_pickup = Data.taxi_merge_df.num_pickup.sum()
 
-    if time_change or scale_change:
-        geo_figure = create_geomap(Data.taxi_trip_filter_df, Data.taxi_geo_json, AppState.scale)
+    if time_change or scale_change or map_attribute_change:
+        geo_figure = create_geomap(Data.taxi_merge_df, Data.taxi_geo_json, AppState.scale, attribute = AppState.geo_map_attribute)
         AppState.taxi_heatmap = geo_figure
     else:
         geo_figure = AppState.taxi_heatmap
 
     if time_change or scatter_change:
-        scatter_figure = create_scatter_plot(Data.taxi_trip_filter_df, AppState.scatter_x, AppState.scatter_y)
+        scatter_figure = create_scatter_plot(Data.taxi_merge_df, AppState.scatter_x, AppState.scatter_y)
         AppState.taxi_scatter = scatter_figure
     else:
         scatter_figure = AppState.taxi_scatter
 
-    return geo_figure,scatter_figure, '## Selected %d trips' % (AppState.total_pickup)
+    trg = dash.callback_context.triggered
+    if trg[0]['prop_id'] == "geo_map.clickData":
+        zone = trg[0]['value']['points'][0]['customdata'][-1]
+        zone_name = trg[0]['value']['points'][0]['location']
+        AppState.select_geomap_zone.append(zone)
+        AppState.select_geomap_zone_name.append(zone_name)
+    zone_df = filter_by_zone_name(Data.taxi_trip_filter_df, AppState.select_geomap_zone)
+    geo_line_map = create_line_fig_by_zipcode(zone_df, AppState.geo_map_attribute, color='zone')
+    return geo_figure, scatter_figure, '## Selected %d trips' % (AppState.total_pickup), geo_line_map
 
 
 @app.callback([Output('covid-19-map', 'figure'),

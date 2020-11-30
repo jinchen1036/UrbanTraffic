@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from visualization.data_filter import filter_by_time, combine_zone_info
+from visualization.data_filter import merge_yellow_taxi_data, filter_by_time, combine_zone_info
 
 class DataSource:
     def __init__(self, path_dir = '../data'):
@@ -17,12 +17,12 @@ class DataSource:
         self.taxi_trip_df = self.get_yellow_taxi_data()
         self.zipcode_trip_df = self.get_yellow_taxi_by_zone()
 
-        self.taxi_trip_filter_df = filter_by_time(self.taxi_trip_df,self.taxi_zone_df, self.agg_column,
+        self.taxi_trip_filter_df = filter_by_time(self.taxi_trip_df,
                                                   year_range = [2019, 2020],
                                                   month_range = [3, 5], days_range = [1, 31],
                                                   hour_range = [0, 23],weekday_range = list(range(7)))
 
-
+        self.taxi_merge_df = merge_yellow_taxi_data(self.taxi_trip_filter_df,self.taxi_zone_df, self.agg_column)
     def get_taxi_zone_geo(self):
         with open('%s/NYC Taxi Zones.geojson'%self.path_dir) as f:
             geo_json = json.load(f)

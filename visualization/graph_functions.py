@@ -19,7 +19,7 @@ def create_geomap(filter_df, geo_json, scale, attribute = "num_pickup",zoom=9.5,
                                mapbox_style="carto-positron",
                                hover_data=['num_pickup','num_dropoff','avg_trip_passenger','avg_trip_speed_mph','avg_trip_distance',
                                            'avg_total_price','avg_price_per_mile', 'num_cash_payment', 'num_card_payment',
-                                           'zone_name','neighborhood','population','median_household_income','zipcode'],
+                                           'zone_name','neighborhood','population','median_household_income','zipcode','zone'],
                                zoom=zoom,
                                center=center,
                                opacity=0.5,
@@ -75,8 +75,8 @@ def create_zipcode_geomap(covid_df, zipcode_trip_df, geo_json, covid_attr,zipcod
 
 
 
-def create_line_fig_by_zipcode(filter_df,attribute_y):
-    fig = px.line(filter_df, x=filter_df.index, y=attribute_y, color='zipcode')
+def create_line_fig_by_zipcode(filter_df,attribute_y, color = 'zipcode'):
+    fig = px.line(filter_df, x=filter_df.index, y=attribute_y, color=color)
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
     return fig
