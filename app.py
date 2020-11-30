@@ -218,11 +218,11 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
     else:
         geo_figure = AppState.taxi_heatmap
 
-    if time_change or scatter_change:
-        scatter_figure = create_scatter_plot(Data.taxi_merge_df, AppState.scatter_x, AppState.scatter_y)
-        AppState.taxi_scatter = scatter_figure
-    else:
-        scatter_figure = AppState.taxi_scatter
+    # if time_change or scatter_change:
+    scatter_figure = create_scatter_plot(Data.taxi_merge_df, AppState.scatter_x, AppState.scatter_y)
+    AppState.taxi_scatter = scatter_figure
+    # else:
+    #     scatter_figure = AppState.taxi_scatter
 
     trg = dash.callback_context.triggered
     if trg[0]['prop_id'] == "geo_map.clickData":
@@ -231,7 +231,10 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
         AppState.select_geomap_zone.append(zone)
         AppState.select_geomap_zone_name.append(zone_name)
     zone_df = filter_by_zone_name(Data.taxi_trip_filter_df, AppState.select_geomap_zone)
-    geo_line_map = create_line_fig_by_zipcode(zone_df, AppState.geo_map_attribute, color='zone')
+    if zone_df.empty:
+        geo_line_map = {}
+    else:
+        geo_line_map = create_line_fig_by_zipcode(zone_df, AppState.geo_map_attribute, color='zone')
     return geo_figure, scatter_figure, '## Selected %d trips' % (AppState.total_pickup), geo_line_map
 
 
