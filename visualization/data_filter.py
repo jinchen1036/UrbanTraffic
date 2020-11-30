@@ -34,8 +34,13 @@ def filter_by_time(trip_df,taxi_zone_df, agg_column, year_range, month_range, da
                                                           end='%d/%d/%d' % (month, days_range[-1], year)))
 
     # filter by time
-    df = trip_df.loc[select_time].between_time(start_time, end_time)
-    df = df[np.isin(np.array(df.index.weekday,dtype=np.int), weekday_range)]
+    year  =  np.isin(np.array(trip_df.index.year,dtype=np.int), year_range)
+    month = np.isin(np.array(trip_df.index.month, dtype=np.int), month_range)
+    day = np.isin(np.array(trip_df.index.day, dtype=np.int), days_range)
+    weekday = np.isin(np.array(trip_df.index.weekday,dtype=np.int), weekday_range)
+
+    trip_df = trip_df[year & month & day & weekday]
+    df = trip_df.between_time(start_time, end_time)
 
     # group by zone
     pickup_group_data = combine_zone_info(data=df.reset_index(), agg_column=agg_column,
