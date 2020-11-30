@@ -168,7 +168,9 @@ app.layout = html.Div(className='app-layout', children=[
                              children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap)])
                 ]),
                 # html.Div(id='select-zipcode'),
+
                 dcc.Markdown(id='select-zipcode',  children=AppState.select_zipcodes_prompt),
+                html.Button('Clear ZipCodes', id='btn-clear-zip', n_clicks=0),
                 html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
                     dcc.Graph(id='select-zipcode-covid-plot', figure={}),
                     dcc.Graph(id='select-zipcode-trip-plot', figure={})
@@ -244,10 +246,11 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
                Input('covid_attribute_dropdown', 'value'),
                Input('zipcode_trip_attribute_dropdown','value'),
                Input('covid-19-map', 'clickData'),
-               Input('zipcode-trip-map', 'clickData')
+               Input('zipcode-trip-map', 'clickData'),
+               Input('btn-clear-zip', 'n_clicks')
                ],
               prevent_initial_call=True)
-def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_attribute_dropdown,click_covid,click_trip):
+def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_attribute_dropdown,click_covid,click_trip, click_clear_zip):
     # check time  change
     print("Selected Data Range: %s -- %s" % (start_date, end_date))
     print("%s vs %s" % (covid_attribute_dropdown,zipcode_trip_attribute_dropdown))
@@ -284,7 +287,11 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
                                                                 AppState.zipcode_trip_attribute_dropdown)
             AppState.set_covid_heatmap(covid_map, zipcode_trip_map)
 
-        if not time_change and not attribute_change:
+
+        changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+        if 'btn-clear-zip' in changed_id:
+            AppState.select_zipcodes = []
+        elif not time_change and not attribute_change:
             trg = dash.callback_context.triggered
             zipcode = trg[0]['value']['points'][0]['location']
 
@@ -293,9 +300,10 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
             else:
                 AppState.select_zipcodes.append(zipcode)
 
-            if not AppState.select_zipcodes:
-                AppState.set_select_zipcodes({}, {}, "### Click on the map to selected zipcode")
-                return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+        if not AppState.select_zipcodes:
+            AppState.set_select_zipcodes({}, {}, "### Click on the map to selected zipcode")
+            return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+
 
 
         # must change no matter what
