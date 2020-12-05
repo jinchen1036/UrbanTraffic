@@ -345,4 +345,4 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()#debug=True)
