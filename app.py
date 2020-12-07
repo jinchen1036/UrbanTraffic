@@ -171,17 +171,22 @@ app.layout = html.Div(className='app-layout', children=[
                                      children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap)])
                         ]),
                         # html.Div(id='select-zipcode'),
-
-                        dcc.Markdown(id='select-zipcode',  children=AppState.select_zipcodes_prompt),
-                        html.Button('Clear ZipCodes', id='btn-clear-zip', n_clicks=0),
-                        html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
-                            dcc.Graph(id='select-zipcode-covid-plot', figure={}),
-                            dcc.Graph(id='select-zipcode-trip-plot', figure={})
-                        ]),
-                        dcc.Graph(id='select-zipcode-correlation-map', figure={})
+                        dcc.Tabs(id='sub-sub-tab', children=[
+                            dcc.Tab(label='Line Chart Comparison', children=[
+                                dcc.Markdown(id='select-zipcode',  children=AppState.select_zipcodes_prompt),
+                                html.Button('Clear ZipCodes', id='btn-clear-zip', n_clicks=0),
+                                html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
+                                    dcc.Graph(id='select-zipcode-covid-plot', figure={}),
+                                    dcc.Graph(id='select-zipcode-trip-plot', figure={})
+                                ])
+                            ]),
+                            dcc.Tab(label='Pearson Correlation Heatmap', children=[
+                                dcc.Graph(id='select-zipcode-correlation-map', figure={})
+                            ])
+                        ])
                     ]),
 
-                    dcc.Tab(label='Pearson Correlation', children=[
+                    dcc.Tab(label='Pearson Correlation Heatmap', children=[
                         dcc.Graph(id='correlation-map', figure=AppState.correlation_heatmap),
                     ])
                 ])
