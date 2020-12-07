@@ -20,6 +20,7 @@ AppState.set_taxi_scatter(create_scatter_plot(Data.taxi_merge_df, AppState.scatt
 covid_df, zipcode_trip_df = filter_zipcode_by_time(Data.covid_19, Data.zipcode_trip_df, Data.agg_column,
                                                       start_day=AppState.covid_start_date,
                                                       end_day=AppState.covid_end_date)
+AppState.set_correlation_heatmap(create_correlation_heatmap(covid_df, zipcode_trip_df))
 AppState.set_attribute_names(covid_df, zipcode_trip_df)
 AppState.set_covid_heatmap(*create_zipcode_geomap(covid_df,zipcode_trip_df, Data.zipcode_geo_json,
                                                   AppState.covid_attribute_dropdown, AppState.zipcode_trip_attribute_dropdown))
@@ -146,34 +147,42 @@ app.layout = html.Div(className='app-layout', children=[
                     ]),
                     html.Div(id='date-picker-warning'),
                 ]),
-                html.Div(style={'columnCount': 4,'display':'flex'},children=[
-                    html.Label('Picked Left Map Attributed'),
-                    dcc.Dropdown(
-                        id='covid_attribute_dropdown',multi=False,
-                        options=AppState.get_attribute_list_dict(AppState.covid_attribute),
-                        value=AppState.covid_attribute_dropdown,
-                        style={'width': '50%'}
-                    ),
-                    html.Label('Picked Right Map Attributed'),
-                    dcc.Dropdown(
-                        id='zipcode_trip_attribute_dropdown',multi=False,
-                        options=AppState.get_attribute_list_dict(AppState.zipcode_trip_attribute),
-                        value=AppState.zipcode_trip_attribute_dropdown,
-                        style={'width': '50%'} #,'padding-left':'10%'
-                    )
-                ]),
-                html.Div(style={'width': '100%', 'columnCount': 2}, children=[
-                    html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap)]),
-                    html.Div(className="row",
-                             children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap)])
-                ]),
-                # html.Div(id='select-zipcode'),
+                dcc.Tabs(id='sub-tab', children=[
+                    dcc.Tab(label='Map Comparison', children=[
+                        html.Div(style={'columnCount': 4,'display':'flex'},children=[
+                            html.Label('Picked Left Map Attributed'),
+                            dcc.Dropdown(
+                                id='covid_attribute_dropdown',multi=False,
+                                options=AppState.get_attribute_list_dict(AppState.covid_attribute),
+                                value=AppState.covid_attribute_dropdown,
+                                style={'width': '50%'}
+                            ),
+                            html.Label('Picked Right Map Attributed'),
+                            dcc.Dropdown(
+                                id='zipcode_trip_attribute_dropdown',multi=False,
+                                options=AppState.get_attribute_list_dict(AppState.zipcode_trip_attribute),
+                                value=AppState.zipcode_trip_attribute_dropdown,
+                                style={'width': '50%'} #,'padding-left':'10%'
+                            )
+                        ]),
+                        html.Div(style={'width': '100%', 'columnCount': 2}, children=[
+                            html.Div(className="row", children=[dcc.Graph(id='covid-19-map', figure=AppState.covid_heatmap)]),
+                            html.Div(className="row",
+                                     children=[dcc.Graph(id='zipcode-trip-map', figure=AppState.zipcode_trip_heatmap)])
+                        ]),
+                        # html.Div(id='select-zipcode'),
 
-                dcc.Markdown(id='select-zipcode',  children=AppState.select_zipcodes_prompt),
-                html.Button('Clear ZipCodes', id='btn-clear-zip', n_clicks=0),
-                html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
-                    dcc.Graph(id='select-zipcode-covid-plot', figure={}),
-                    dcc.Graph(id='select-zipcode-trip-plot', figure={})
+                        dcc.Markdown(id='select-zipcode',  children=AppState.select_zipcodes_prompt),
+                        html.Button('Clear ZipCodes', id='btn-clear-zip', n_clicks=0),
+                        html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
+                            dcc.Graph(id='select-zipcode-covid-plot', figure={}),
+                            dcc.Graph(id='select-zipcode-trip-plot', figure={})
+                        ])
+                    ]),
+
+                    dcc.Tab(label='Pearson Correlation', children=[
+                        dcc.Graph(id='correlation-map', figure=AppState.correlation_heatmap),
+                    ])
                 ])
             ])
         ])
@@ -243,7 +252,8 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
                Output('date-picker-warning','children'),
                Output('select-zipcode-covid-plot', 'figure'),
                Output('select-zipcode-trip-plot', 'figure'),
-               Output('select-zipcode', 'children')],
+               Output('select-zipcode', 'children'),
+               Output('correlation-map','figure')],
               [Input('date-picker', 'start_date'),
                Input('date-picker', 'end_date'),
                Input('covid_attribute_dropdown', 'value'),
@@ -259,10 +269,10 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
     print("%s vs %s" % (covid_attribute_dropdown,zipcode_trip_attribute_dropdown))
     if pd.Timestamp(start_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different start date" % start_date
-        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
     elif pd.Timestamp(end_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different end date" % end_date
-        return AppState.covid_heatmap,AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+        return AppState.covid_heatmap,AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
     else:
         covid_time_dict = {
             'covid_start_date': start_date,  # datetime.fromisoformat(start_date),
@@ -281,6 +291,7 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
                                                                   start_day=AppState.covid_start_date,
                                                                   end_day =AppState.covid_end_date)
             AppState.set_attribute_names(covid_df, zipcode_trip_df)
+            AppState.set_correlation_heatmap(create_correlation_heatmap(covid_df, zipcode_trip_df))
 
 
 
@@ -305,7 +316,7 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
 
         if not AppState.select_zipcodes:
             AppState.set_select_zipcodes({}, {}, "### Click on the map to selected zipcode")
-            return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+            return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
 
 
 
@@ -330,7 +341,7 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
 
         AppState.set_select_zipcodes(covid_line, zipcode_trip_line, show_prompt)
 
-        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt
+        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
 
 # @app.callback([],
 #                [Input('covid-19-map', 'clickData'),

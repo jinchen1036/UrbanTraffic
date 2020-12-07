@@ -41,6 +41,9 @@ class AppData:
         self.covid_heatmap = covid_heatmap
         self.zipcode_trip_heatmap = zipcode_trip_heatmap
 
+    def set_correlation_heatmap(self,correlation_heatmap):
+        self.correlation_heatmap = correlation_heatmap
+
     def set_attribute_names(self,covid_df, zipcode_trip_df):
         self.covid_df = covid_df
         self.covid_attribute = covid_df.select_dtypes([np.number]).columns.values

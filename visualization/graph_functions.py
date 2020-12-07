@@ -1,5 +1,7 @@
 import numpy as np
+import pandas as pd
 import plotly.express as px
+import plotly.figure_factory as ff
 
 def create_geomap(filter_df, geo_json, scale, attribute = "num_pickup",zoom=9.5,center={"lat": 40.7, "lon": -73.99}):
 
@@ -79,4 +81,17 @@ def create_line_fig_by_zipcode(filter_df,attribute_y, color = 'zipcode'):
     fig = px.line(filter_df, x=filter_df.index, y=attribute_y, color=color)
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
+    return fig
+
+def create_correlation_heatmap(covid_df, zipcode_trip_df):
+    result = pd.merge(covid_df, zipcode_trip_df, left_on='zipcode',right_on='zipcode')
+    correlation = result.corr()
+    rounds = np.around(correlation.values, decimals=2)
+    fig = ff.create_annotated_heatmap(correlation.values, x = list(correlation.columns),
+                                  y=list(correlation.columns),
+                                    annotation_text = rounds,
+                                  colorscale=px.colors.sequential.Reds)
+    fig.update_layout(
+        width=1200, height=700
+    )
     return fig
