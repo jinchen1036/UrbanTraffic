@@ -1,4 +1,4 @@
-# Urban Traffic 
+# [Urban Traffic](https://urban-traffic-visualization.herokuapp.com/)
 
 # Dataset 
 - [NYC Yellow Taxi Data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
@@ -17,10 +17,10 @@
 - To update requirements.txt ->  `pip freeze > requirements.txt`
 
 # Visualization
-- To run the visualization - have complete the setup 
-```
-    python app.py
-```
+- To run the visualization - have completed the setup 
+    1. Make sure in the app.py file line 14 is `Data = DataSource("../data")`
+    2. Execute the app in terminal `python app.py`
+    
 - The file for running the visualization is in [**visualization/main.py**](https://github.com/jinchen1036/UrbanTraffic/blob/main/visualization/main.py)
     - [plotly](https://plotly.com/python/plotly-fundamentals/) is use as the main visualization package
     
