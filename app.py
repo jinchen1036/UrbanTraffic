@@ -177,7 +177,8 @@ app.layout = html.Div(className='app-layout', children=[
                         html.Div(className="row", style={'width': '100%', 'columnCount': 2}, children=[
                             dcc.Graph(id='select-zipcode-covid-plot', figure={}),
                             dcc.Graph(id='select-zipcode-trip-plot', figure={})
-                        ])
+                        ]),
+                        dcc.Graph(id='select-zipcode-correlation-map', figure={})
                     ]),
 
                     dcc.Tab(label='Pearson Correlation', children=[
@@ -253,7 +254,8 @@ def update_figure_by_time(year_range, month_range, days_range, hour_range,weekda
                Output('select-zipcode-covid-plot', 'figure'),
                Output('select-zipcode-trip-plot', 'figure'),
                Output('select-zipcode', 'children'),
-               Output('correlation-map','figure')],
+               Output('correlation-map','figure'),
+               Output('select-zipcode-correlation-map','figure')],
               [Input('date-picker', 'start_date'),
                Input('date-picker', 'end_date'),
                Input('covid_attribute_dropdown', 'value'),
@@ -269,10 +271,10 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
     print("%s vs %s" % (covid_attribute_dropdown,zipcode_trip_attribute_dropdown))
     if pd.Timestamp(start_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different start date" % start_date
-        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
+        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap, AppState.select_zipcode_correlation_fig
     elif pd.Timestamp(end_date,tz='UTC') not in Data.covid_available_days:
         warning = "There is no data available for %s, please select a different end date" % end_date
-        return AppState.covid_heatmap,AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
+        return AppState.covid_heatmap,AppState.zipcode_trip_heatmap, warning, AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap, AppState.select_zipcode_correlation_fig
     else:
         covid_time_dict = {
             'covid_start_date': start_date,  # datetime.fromisoformat(start_date),
@@ -316,7 +318,7 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
 
         if not AppState.select_zipcodes:
             AppState.set_select_zipcodes({}, {}, "### Click on the map to selected zipcode")
-            return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
+            return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap, AppState.select_zipcode_correlation_fig
 
 
 
@@ -325,6 +327,7 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
                                                                            AppState.select_zipcodes,
                                                                            start_day=AppState.covid_start_date,
                                                                            end_day=AppState.covid_end_date)
+        AppState.select_zipcode_correlation_fig = create_correlation_heatmap_selected_zipcode(covid_df, zipcode_trip_df, AppState.select_zipcodes[-1])
         show_prompt = '### Selected Zipcodes: %s' % (', '.join(map(str, AppState.select_zipcodes)))
         if covid_df.empty:
             show_prompt += "- No COVID-19 data available"
@@ -341,7 +344,7 @@ def update_output(start_date, end_date,covid_attribute_dropdown,zipcode_trip_att
 
         AppState.set_select_zipcodes(covid_line, zipcode_trip_line, show_prompt)
 
-        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap
+        return AppState.covid_heatmap, AppState.zipcode_trip_heatmap, "", AppState.select_zipcodes_covid_fig, AppState.select_zipcodes_trip_fig, AppState.select_zipcodes_prompt, AppState.correlation_heatmap, AppState.select_zipcode_correlation_fig
 
 # @app.callback([],
 #                [Input('covid-19-map', 'clickData'),

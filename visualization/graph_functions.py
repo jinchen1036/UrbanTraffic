@@ -95,3 +95,36 @@ def create_correlation_heatmap(covid_df, zipcode_trip_df):
         width=1300, height=700
     )
     return fig
+
+def create_correlation_heatmap_selected_zipcode(covid_df, zipcode_trip_df, zipcode):
+    z = zipcode_trip_df[zipcode_trip_df.zipcode == zipcode].resample('D').mean().dropna()
+    z.index = z.index.tz_localize(tz='UTC')
+
+    z.reset_index(inplace=True)
+    z1 = covid_df[covid_df.zipcode == zipcode].resample('D').mean()
+    z1 = z1.reset_index()
+
+    result = pd.merge(z1, z, left_on=['time'],right_on=['time']).dropna()
+
+    if result.empty:
+        return {}
+    correlation = result[['num_cases', 'num_test', 'num_pickup', 'num_cash_payment', 'num_card_payment', 'num_dropoff',
+                          'avg_trip_passenger', 'avg_trip_speed_mph', 'avg_trip_distance',
+                          'avg_total_price', 'avg_price_per_mile']].corr()
+
+    rounds = np.around(correlation.values, decimals=2)
+    fig = ff.create_annotated_heatmap(correlation.values, x=list(correlation.columns),
+                                      y=list(correlation.columns),
+                                      annotation_text=rounds, zmin=-1, zmax=1,
+                                      colorscale=px.colors.sequential.RdBu, showscale=True)
+
+    # Make text size smaller
+    for i in range(len(fig.layout.annotations)):
+        fig.layout.annotations[i].font.size = 8
+
+    fig.update_layout(
+        width=1200, height=700,title = 'Pearson Correlation of Zipcode %d'%zipcode
+    )
+    fig['layout']['xaxis']['side'] = 'bottom'
+
+    return fig

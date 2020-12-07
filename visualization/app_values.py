@@ -27,6 +27,7 @@ class AppData:
         self.select_zipcodes_covid_fig = {}
         self.select_zipcodes_trip_fig = {}
         self.select_zipcodes_prompt = "### Click on the map to selected zipcode"
+        self.select_zipcode_correlation_fig = {}
 
     def get_attribute_list_dict(self, attributes):
         return [{'label': i, 'value': i} for i in attributes]
