@@ -88,10 +88,10 @@ def create_correlation_heatmap(covid_df, zipcode_trip_df):
     correlation = result.corr()
     rounds = np.around(correlation.values, decimals=2)
     fig = ff.create_annotated_heatmap(correlation.values, x = list(correlation.columns),
-                                  y=list(correlation.columns),
-                                    annotation_text = rounds,
-                                  colorscale=px.colors.sequential.Reds)
+                                      y=list(correlation.columns),
+                                      annotation_text = rounds,zmin=-1, zmax=1,
+                                      colorscale=px.colors.sequential.RdBu, showscale=True)
     fig.update_layout(
-        width=1200, height=700
+        width=1300, height=700
     )
     return fig
