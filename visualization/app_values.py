@@ -28,6 +28,7 @@ class AppData:
         self.select_zipcodes_trip_fig = {}
         self.select_zipcodes_prompt = "### Click on the map to selected zipcode"
         self.select_zipcode_correlation_fig = {}
+        self.bar_chart = {}
 
     def get_attribute_list_dict(self, attributes):
         return [{'label': i, 'value': i} for i in attributes]
@@ -44,6 +45,9 @@ class AppData:
 
     def set_correlation_heatmap(self,correlation_heatmap):
         self.correlation_heatmap = correlation_heatmap
+
+    def set_bar_chart(self, bar_chart):
+        self.bar_chart = bar_chart
 
     def set_attribute_names(self,covid_df, zipcode_trip_df):
         self.covid_df = covid_df

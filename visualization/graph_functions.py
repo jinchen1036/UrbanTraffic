@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 
 def create_geomap(filter_df, geo_json, scale, attribute = "num_pickup",zoom=9.5,center={"lat": 40.7, "lon": -73.99}):
 
@@ -127,4 +129,20 @@ def create_correlation_heatmap_selected_zipcode(covid_df, zipcode_trip_df, zipco
     )
     fig['layout']['xaxis']['side'] = 'bottom'
 
+    return fig
+
+
+def create_bar_charts(filter_data, title):
+    columns =  ['num_pickup', 'num_dropoff', 'avg_trip_passenger','avg_total_price',
+                'avg_trip_distance','avg_trip_speed_mph', 'num_cash_payment', 'num_card_payment']
+    n_row = len(columns)//2
+    fig = make_subplots(rows= n_row, cols=2, subplot_titles=columns)
+
+    for index, column_name in enumerate(columns):
+        r = (index) % n_row + 1
+        c = (index) // n_row + 1
+        # print(r,c)
+        fig.add_trace(go.Bar(x=filter_data.time, y=filter_data[column_name]),row = r, col = c)
+
+    fig.update_layout(showlegend=False,title_text=title, height=800)
     return fig

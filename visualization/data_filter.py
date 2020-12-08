@@ -96,3 +96,19 @@ def filter_by_zone_name(filter_df, zone_name):
 #         select_time = select_time.union(pd.date_range(start='%d/%d/%d'%(month,days_range[0],year),
 #                                              end='%d/%d/%d'%(month,days_range[-1],year)))
 #
+
+
+def filter_barchart_time(trip_df, year_range, month_range, days_range,weekday_range, zone_name):
+    hour_range = [0, 23]
+
+    filter_data = filter_by_time(trip_df, year_range, month_range, days_range, hour_range, weekday_range)
+    figure_title = "Distribution of All Taxi Zones Data through out 24 Hours"
+    if zone_name:
+        in_zone = np.isin(np.array(filter_data.zone, dtype=np.int), zone_name)
+        filter_data = filter_data[in_zone]
+        figure_title = "Distribution of Data through out 24 Hours for Taxi Zones: " + ",".join(map(str, zone_name))
+
+    filter_data = filter_data.groupby([filter_data.index.hour]).mean()
+    filter_data = filter_data.reset_index()
+
+    return filter_data, figure_title
