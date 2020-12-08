@@ -26,7 +26,7 @@ def create_geomap(filter_df, geo_json, scale, attribute = "num_pickup",zoom=9.5,
                                center=center,
                                opacity=0.5,
                                color_continuous_scale = px.colors.sequential.Reds,
-                               width=1300, height=650,
+                               width=1300, height=670,
                                title=color_string
                                )
 
