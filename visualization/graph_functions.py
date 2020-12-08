@@ -9,7 +9,7 @@ def create_geomap(filter_df, geo_json, scale, attribute = "num_pickup",zoom=9.5,
         color_string = attribute
     else:
         color_string = "LogScale-%s"%attribute
-        filter_df[color_string] = np.log10(filter_df["num_pickup"])
+        filter_df[color_string] = np.log10(filter_df[attribute])
 
     fig = px.choropleth_mapbox(filter_df,
                                geojson=geo_json,
@@ -26,7 +26,7 @@ def create_geomap(filter_df, geo_json, scale, attribute = "num_pickup",zoom=9.5,
                                center=center,
                                opacity=0.5,
                                color_continuous_scale = px.colors.sequential.Reds,
-                               width=1300, height=600,
+                               width=1300, height=650,
                                title=color_string
                                )
 
