@@ -20,10 +20,13 @@
 # Visualization
 - To run the visualization - have completed the setup 
     1. Execute the app in terminal `python3 app.py`
+    2. Go to `http://127.0.0.1:8050/` after executed above line
     
 - The file for running the visualization is in [**visualization/main.py**](https://github.com/jinchen1036/UrbanTraffic/blob/main/visualization/main.py)
     - [plotly](https://plotly.com/python/plotly-fundamentals/) is use as the main visualization package
-    
+
+# Checkout Execute Code Instruction Video -> ExecuteCodeInstruction.mov
+
 # Deployment
 - [Live Link](https://urban-traffic-visualization.herokuapp.com/)
 - [Documentation](https://dash.plotly.com/deployment)
