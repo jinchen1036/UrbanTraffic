@@ -8,18 +8,18 @@
 - [Zipcode Information](https://pypi.org/project/uszipcode/)
 
 # Setup 
+- Make sure you have python3 install in your machine
 - Clone and install packages and modules
 ```
     git clone https://github.com/jinchen1036/UrbanTraffic.git
     cd UrbanTraffic
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
 ```
 - To update requirements.txt ->  `pip freeze > requirements.txt`
 
 # Visualization
 - To run the visualization - have completed the setup 
-    1. Make sure in the app.py file line 14 is `Data = DataSource("../data")`
-    2. Execute the app in terminal `python app.py`
+    1. Execute the app in terminal `python3 app.py`
     
 - The file for running the visualization is in [**visualization/main.py**](https://github.com/jinchen1036/UrbanTraffic/blob/main/visualization/main.py)
     - [plotly](https://plotly.com/python/plotly-fundamentals/) is use as the main visualization package
